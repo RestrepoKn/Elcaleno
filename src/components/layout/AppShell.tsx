@@ -1,0 +1,8 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { Container } from "@/components/ui/Container";
+
+export function AppShell({ children }: { children: ReactNode }) {
+  return <div className="min-h-screen bg-slate-950 text-white"><header className="border-b border-white/10"><Container className="flex h-16 items-center justify-between"><Link href="/" className="font-mono text-sm font-bold tracking-[0.25em] text-amber-300">ELCALENO</Link><nav className="flex items-center gap-5 text-sm text-white/60"><Link href="/dashboard" className="hover:text-white">Panel</Link><Link href="/notes" className="hover:text-white">Notas</Link><Link href="/status" className="hover:text-white">Estado</Link><ThemeToggle /></nav></Container></header><div className="md:grid md:grid-cols-[220px_1fr]"><aside className="hidden min-h-[calc(100vh-4rem)] border-r border-white/10 p-6 md:block"><p className="mb-4 text-xs uppercase tracking-widest text-white/40">Workspace</p><Link href="/dashboard" className="block rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white">Resumen</Link><Link href="/notes" className="block rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white">Notas</Link><Link href="/status" className="block rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white">Sistema</Link></aside><main>{children}</main></div></div>;
+}
