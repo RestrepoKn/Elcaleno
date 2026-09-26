@@ -76,9 +76,8 @@ export default function LoginPage() {
               placeholder="tu@correo.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              error={errors.email}
               aria-invalid={Boolean(errors.email)}
-              aria-describedby={errors.email ? "email-error" : undefined}
+              {...(errors.email ? { error: errors.email, "aria-describedby": "email-error" } : {})}
               className="mt-2 rounded-md border-white/15 bg-white/[0.04] placeholder:text-white/25 focus:border-amber-300"
             />
             <Input
@@ -90,9 +89,8 @@ export default function LoginPage() {
               placeholder="Tu contraseña"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              error={errors.password}
               aria-invalid={Boolean(errors.password)}
-              aria-describedby={errors.password ? "password-error" : undefined}
+              {...(errors.password ? { error: errors.password, "aria-describedby": "password-error" } : {})}
               className="mt-2 rounded-md border-white/15 bg-white/[0.04] placeholder:text-white/25 focus:border-amber-300"
             />
             <div className="flex justify-end">
