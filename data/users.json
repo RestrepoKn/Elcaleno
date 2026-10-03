@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "version": 1,
+    "lastModified": "2026-10-03T00:00:00.000Z",
+    "description": "Usuarios locales de Elcaleño"
+  },
+  "records": [
+    {
+      "id": "usr_demo",
+      "createdAt": "2026-10-03T00:00:00.000Z",
+      "updatedAt": "2026-10-03T00:00:00.000Z",
+      "email": "demo@elcaleno.com",
+      "passwordHash": "scrypt$237160f955972fd60a682fb85a49a839$13ec0a27e6ac64904e6f27d2d3aa86e34feba6f623a0a35c3ecd5a8b9f1d23df9d0d06c363b9f78c8aff22368159535e6b5eb2f7a9cc5d3b246abbcf503de051",
+      "name": "Usuario demo",
+      "active": true
+    }
+  ]
+}

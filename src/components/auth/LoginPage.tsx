@@ -12,7 +12,7 @@ export function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const nextErrors: { email?: string; password?: string } = {};
@@ -27,16 +27,23 @@ export function LoginPage() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setIsSubmitting(true);
-    window.setTimeout(() => {
-      // TODO: conectar con la API real
-      if (email.trim().toLowerCase() === "demo@elcaleno.com" && password === "demo1234") {
-        router.push("/dashboard");
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
+      const result = await response.json() as { error?: string };
+      if (!response.ok) {
+        setErrors({ password: result.error ?? "Correo o contraseña incorrectos." });
         return;
       }
-
-      setErrors({ password: "Correo o contraseña incorrectos" });
+      router.push("/dashboard");
+    } catch {
+      setErrors({ password: "No se pudo conectar. Inténtalo de nuevo." });
+    } finally {
       setIsSubmitting(false);
-    }, 600);
+    }
   }
 
   return (

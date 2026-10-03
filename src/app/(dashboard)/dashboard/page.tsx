@@ -1,5 +1,9 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
+import { requireUser } from "@/lib/auth";
 
-export default function DashboardPage() { return <Container className="py-12"><p className="mb-3 font-mono text-xs uppercase tracking-[0.3em] text-cyan-300">Workspace</p><h1 className="text-4xl font-bold tracking-tight">Panel de control</h1><div className="mt-10 grid gap-4 md:grid-cols-3"><Card><p className="text-xs text-white/45">Colecciones</p><p className="mt-4 text-4xl font-bold">01</p><p className="mt-2 text-sm text-white/45">JSON-DB local</p></Card><Card><p className="text-xs text-white/45">API</p><Badge variant="success" className="mt-4">Salud estable</Badge><p className="mt-2 text-sm text-white/45">Health endpoint disponible</p></Card><Card><p className="text-xs text-white/45">Siguiente módulo</p><p className="mt-4 text-2xl font-bold">Notas</p><p className="mt-2 text-sm text-white/45">Preparado para Fase 3</p></Card></div></Container>; }
+export default async function DashboardPage() {
+	await requireUser();
+	return <Container className="py-12"><p className="mb-3 font-mono text-xs uppercase tracking-[0.3em] text-cyan-300">Workspace</p><h1 className="text-4xl font-bold tracking-tight">Panel de control</h1><div className="mt-10 grid gap-4 md:grid-cols-3"><Card><p className="text-xs text-white/45">Colecciones</p><p className="mt-4 text-4xl font-bold">01</p><p className="mt-2 text-sm text-white/45">JSON-DB local</p></Card><Card><p className="text-xs text-white/45">API</p><Badge variant="success" className="mt-4">Salud estable</Badge><p className="mt-2 text-sm text-white/45">Health endpoint disponible</p></Card><Card><p className="text-xs text-white/45">Siguiente módulo</p><p className="mt-4 text-2xl font-bold">Notas</p><p className="mt-2 text-sm text-white/45">Preparado para Fase 3</p></Card></div></Container>;
+}

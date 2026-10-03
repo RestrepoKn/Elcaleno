@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSchema } from "@data/_schema/registry";
 import { create, getAll, getById, remove, update, JsonDBError } from "@/lib/json-db";
+import { getCurrentUser } from "@/lib/auth";
 import type { BaseRecord } from "@/lib/types";
 
 type Context = { params: Promise<{ collection: string }> };
@@ -12,8 +13,15 @@ function errorResponse(error: unknown) {
   return NextResponse.json({ success: false, error: error instanceof Error ? error.message : "Error interno", code, timestamp: new Date().toISOString() }, { status });
 }
 
+async function unauthorizedResponse() {
+  if (await getCurrentUser()) return null;
+  return NextResponse.json({ success: false, error: "Debes iniciar sesión." }, { status: 401 });
+}
+
 export async function GET(request: Request, { params }: Context) {
   try {
+    const unauthorized = await unauthorizedResponse();
+    if (unauthorized) return unauthorized;
     const { collection } = await params;
     if (!getSchema(collection)) return errorResponse(new JsonDBError("NOT_FOUND", "Colección no registrada."));
     const url = new URL(request.url);
@@ -30,6 +38,8 @@ export async function GET(request: Request, { params }: Context) {
 
 export async function POST(request: Request, { params }: Context) {
   try {
+    const unauthorized = await unauthorizedResponse();
+    if (unauthorized) return unauthorized;
     const { collection } = await params;
     const schema = getSchema(collection);
     if (!schema) return errorResponse(new JsonDBError("NOT_FOUND", "Colección no registrada."));
@@ -40,6 +50,8 @@ export async function POST(request: Request, { params }: Context) {
 
 export async function PUT(request: Request, { params }: Context) {
   try {
+    const unauthorized = await unauthorizedResponse();
+    if (unauthorized) return unauthorized;
     const { collection } = await params;
     const schema = getSchema(collection);
     if (!schema) return errorResponse(new JsonDBError("NOT_FOUND", "Colección no registrada."));
@@ -53,6 +65,8 @@ export async function PUT(request: Request, { params }: Context) {
 
 export async function DELETE(request: Request, { params }: Context) {
   try {
+    const unauthorized = await unauthorizedResponse();
+    if (unauthorized) return unauthorized;
     const { collection } = await params;
     const id = new URL(request.url).searchParams.get("id");
     if (!id) return errorResponse(new JsonDBError("VALIDATION_ERROR", "El parámetro id es obligatorio."));
