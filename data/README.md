@@ -4,4 +4,4 @@ Cada archivo JSON representa una colección con `_meta` y `records`. Los esquema
 
 El almacenamiento local es adecuado para desarrollo. Los entornos serverless deben usar un adaptador externo antes de habilitar escrituras.
 
-La autenticación local usa `users.json` y `sessions.json`, que no están expuestos por la API genérica de colecciones. Las contraseñas se almacenan derivadas con scrypt y las sesiones como hashes de tokens aleatorios. Para probar en desarrollo: `demo@elcaleno.com` / `demo1234`. Cambia o elimina esta cuenta antes de publicar el sistema.
+La autenticación usa las tablas privadas `public.users` y `public.user_sessions` de Supabase. La migración está en `supabase/migrations/`; aplícala con `npm run db:migrate`. Las contraseñas usan scrypt y solo la clave de conexión server-side accede a las tablas. En desarrollo se siembra la cuenta `demo@elcaleno.com` / `demo1234`; cámbiala o elimínala antes de publicar.
