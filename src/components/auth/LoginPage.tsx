@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
-export function LoginPage() {
+export function LoginPage({ passwordRestablecida = false }: { passwordRestablecida?: boolean }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,6 +73,11 @@ export function LoginPage() {
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-amber-300">Acceso</p>
           <h2 className="mt-3 text-3xl font-bold">Bienvenido</h2>
           <p className="mt-2 text-sm text-white/55">Ingresa a tu inventario.</p>
+          {passwordRestablecida ? (
+            <p role="status" className="mt-5 border border-emerald-300/30 bg-emerald-300/10 px-4 py-3 text-sm text-emerald-200">
+              Tu contraseña se restableció correctamente. Ya puedes iniciar sesión.
+            </p>
+          ) : null}
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit} noValidate>
             <Input
@@ -101,13 +107,12 @@ export function LoginPage() {
               className="mt-2 rounded-md border-white/15 bg-white/[0.04] placeholder:text-white/25 focus:border-amber-300"
             />
             <div className="flex justify-end">
-              <a
-                href="#"
-                onClick={(event) => event.preventDefault()}
+              <Link
+                href="/recuperar-contrasena"
                 className="text-sm text-cyan-300 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-300"
               >
-                Olvidé mi contraseña
-              </a>
+                ¿Olvidaste tu contraseña?
+              </Link>
             </div>
             <Button
               type="submit"
