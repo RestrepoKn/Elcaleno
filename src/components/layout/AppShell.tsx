@@ -17,6 +17,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
             <Link href="/dashboard" className="shrink-0 hover:text-white">Panel</Link>
             <Link href="/notes" className="shrink-0 hover:text-white">Notas</Link>
             <Link href="/status" className="shrink-0 hover:text-white">Estado</Link>
+            <Link href="/password" className="shrink-0 hover:text-white">Contraseña</Link>
             {user?.role === "admin" ? <Link href="/users" className="shrink-0 hover:text-white">Usuarios</Link> : null}
             <ThemeToggle />
             <form action="/api/auth/logout" method="post"><button type="submit" className="shrink-0 hover:text-white">Salir</button></form>
@@ -29,6 +30,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
           <Link href="/dashboard" className={linkClass}>Resumen</Link>
           <Link href="/notes" className={linkClass}>Notas</Link>
           <Link href="/status" className={linkClass}>Sistema</Link>
+          <Link href="/password" className={linkClass}>Cambiar contraseña</Link>
           {user?.role === "admin" ? <Link href="/users" className={linkClass}>Usuarios</Link> : null}
         </aside>
         <main>{children}</main>
