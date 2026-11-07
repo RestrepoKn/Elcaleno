@@ -1,3 +1,5 @@
 import type { HTMLAttributes } from "react";
 
-export function Card({ className = "", ...props }: HTMLAttributes<HTMLDivElement>) { return <div className={`border border-white/10 bg-white/[0.04] p-5 ${className}`} {...props} />; }
+export function Card({ className = "", ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={`rounded-xl border border-borde bg-superficie p-5 shadow-sm ${className}`} {...props} />;
+}

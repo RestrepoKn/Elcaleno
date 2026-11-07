@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
-:root { --background: #09111f; --foreground: #f4f7fb; }
+/* Un solo diseño claro para toda la app (login, panel e inventario), con la paleta de la sección 13. */
+:root { --background: #fcf6f5; --foreground: #2b2b2b; }
 
 @theme inline {
   --color-background: var(--background);

@@ -1,2 +1,18 @@
 import Link from "next/link";
-export default function NotFound() { return <main className="flex min-h-screen items-center justify-center bg-slate-950 px-6 text-center text-white"><div><p className="font-mono text-sm text-cyan-300">404 / NO ENCONTRADO</p><h1 className="mt-4 text-5xl font-bold">Esta ruta no existe.</h1><Link href="/" className="mt-8 inline-block rounded-md bg-amber-300 px-5 py-3 font-semibold text-slate-950">Volver al inicio</Link></div></main>; }
+
+export default function NotFound() {
+  return (
+    <main className="flex min-h-screen flex-1 items-center justify-center bg-fondo px-6 text-center text-texto">
+      <div>
+        <p className="text-sm font-semibold text-primario">404 · No encontrado</p>
+        <h1 className="mt-3 text-3xl font-bold">Esta página no existe.</h1>
+        <Link
+          href="/"
+          className="mt-8 inline-flex min-h-11 items-center rounded-lg bg-primario px-5 font-semibold text-white hover:bg-primario-oscuro focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primario"
+        >
+          Volver al inicio
+        </Link>
+      </div>
+    </main>
+  );
+}

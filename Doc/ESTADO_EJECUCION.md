@@ -271,3 +271,18 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
 - `FormularioTurno`: se quitaron las sugerencias. El nombre viene escrito como "Completo" y se puede cambiar solo si se abre otro turno en la misma fecha (fecha más nombre es único). Sigue siendo texto libre (D-4).
 - Base de datos: el turno abierto "Mañana" del estudiante se renombró a "Completo", con sus 8 filas intactas; el turno de demostración "Demo Mañana" (cerrado), a "Demo Completo". Este último es una excepción a RN-14, justificada porque es un dato de demostración y solo cambió el nombre.
 - `scripts/cargar-demo.ts` y A-05 de `Doc/ACEPTACION.md` usan el nombre nuevo.
+
+### Diseño unificado del login y el panel · 2026-11-07
+
+- Pedido del estudiante: que el login y el panel se vean como el inventario. Afecta código de otro módulo; solo cambió la presentación y la lógica quedó igual.
+- `globals.css`: el fondo y el texto globales pasan a la paleta clara (`#fcf6f5` y `#2b2b2b`).
+- Componentes base en inglés (`Button`, `Input`, `Badge`, `Card`, `Spinner`): misma API, ahora con los colores del inventario y foco visible.
+- `MarcoAcceso` (nuevo): panel cereza con la marca y tarjeta blanca; en el celular, la marca arriba. Lo usan el login, recuperar contraseña y restablecer contraseña. `MensajeAcceso` reemplaza los avisos verde y rojo oscuros.
+- Panel:
+  - `AppShell` y `NavegacionPanel` (nuevo): barra cereza como la del inventario, con el enlace activo subrayado y la navegación deslizable en el celular.
+  - Se quitó el interruptor Claro/Oscuro: con un solo diseño no hace falta. `ThemeToggle` queda sin uso.
+- Portada del panel (`/dashboard`): antes mostraba textos de plantilla ("JSON-DB local", "Preparado para Fase 3"). Ahora saluda y tiene accesos directos al inventario según el rol (inventario, turno, historial, productos) y a la cuenta (contraseña, usuarios, notas, estado).
+- Notas, Estado, Contraseña y Usuarios: sin clases oscuras, con títulos como los del inventario. `not-found` y `loading` también pasan a la paleta clara.
+- Verificación con `next dev`: las 9 pantallas responden 200 con su contenido. En el HTML solo queda texto blanco sobre fondo cereza (intencional).
+- `npm run type-check`, `npm test` (138), `npm run lint` (0 avisos) y `npm run build`: todo correcto.
+- Pendiente: revisión visual en el celular, porque no hay navegador en esta sesión.

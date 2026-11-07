@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { claseEnlaceAcceso, MensajeAcceso } from "@/components/auth/MarcoAcceso";
 
 export function RecoveryRequestForm() {
   const [email, setEmail] = useState("");
@@ -48,15 +49,14 @@ export function RecoveryRequestForm() {
         placeholder="tu@correo.com"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
-        className="mt-2 rounded-md border-white/15 bg-white/[0.04] placeholder:text-white/25 focus:border-amber-300"
       />
-      {error ? <p role="alert" className="border border-red-300/30 bg-red-300/10 px-4 py-3 text-sm text-red-200">{error}</p> : null}
-      {mensaje ? <p role="status" className="border border-emerald-300/30 bg-emerald-300/10 px-4 py-3 text-sm text-emerald-200">{mensaje}</p> : null}
-      <Button type="submit" size="lg" disabled={procesando} className="w-full rounded-md bg-amber-300 text-slate-950 hover:bg-amber-200">
+      {error ? <MensajeAcceso tipo="error">{error}</MensajeAcceso> : null}
+      {mensaje ? <MensajeAcceso tipo="exito">{mensaje}</MensajeAcceso> : null}
+      <Button type="submit" size="lg" disabled={procesando} className="w-full">
         {procesando ? "Enviando..." : "Enviar enlace"}
       </Button>
-      <p className="text-center text-sm text-white/55">
-        <Link href="/login" className="text-cyan-300 underline-offset-4 hover:underline">Volver al inicio de sesión</Link>
+      <p className="text-center text-sm text-texto-suave">
+        <Link href="/login" className={claseEnlaceAcceso}>Volver al inicio de sesión</Link>
       </p>
     </form>
   );

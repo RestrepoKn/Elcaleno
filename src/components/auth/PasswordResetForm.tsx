@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { claseEnlaceAcceso, MensajeAcceso } from "@/components/auth/MarcoAcceso";
 
 export function PasswordResetForm({ token }: { token: string }) {
   const router = useRouter();
@@ -58,7 +59,6 @@ export function PasswordResetForm({ token }: { token: string }) {
         maxLength={128}
         value={contrasena}
         onChange={(event) => setContrasena(event.target.value)}
-        className="mt-2 rounded-md border-white/15 bg-white/[0.04] placeholder:text-white/25 focus:border-amber-300"
       />
       <Input
         id="confirm-password"
@@ -70,19 +70,18 @@ export function PasswordResetForm({ token }: { token: string }) {
         maxLength={128}
         value={confirmacion}
         onChange={(event) => setConfirmacion(event.target.value)}
-        className="mt-2 rounded-md border-white/15 bg-white/[0.04] placeholder:text-white/25 focus:border-amber-300"
       />
       {error ? (
         <>
-          <p role="alert" className="border border-red-300/30 bg-red-300/10 px-4 py-3 text-sm text-red-200">{error}</p>
+          <MensajeAcceso tipo="error">{error}</MensajeAcceso>
           {error === "El enlace no es válido o ya venció." ? (
-            <p className="text-sm text-white/55">
-              <Link href="/recuperar-contrasena" className="text-cyan-300 underline-offset-4 hover:underline">Solicitar otro enlace</Link>
+            <p className="text-sm text-texto-suave">
+              <Link href="/recuperar-contrasena" className={claseEnlaceAcceso}>Solicitar otro enlace</Link>
             </p>
           ) : null}
         </>
       ) : null}
-      <Button type="submit" size="lg" disabled={procesando} className="w-full rounded-md bg-amber-300 text-slate-950 hover:bg-amber-200">
+      <Button type="submit" size="lg" disabled={procesando} className="w-full">
         {procesando ? "Actualizando..." : "Restablecer contraseña"}
       </Button>
     </form>

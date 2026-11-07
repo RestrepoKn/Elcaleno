@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { MensajeAcceso } from "@/components/auth/MarcoAcceso";
 
 export function ChangePasswordForm() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -89,8 +90,8 @@ export function ChangePasswordForm() {
         value={confirmPassword}
         onChange={(event) => setConfirmPassword(event.target.value)}
       />
-      {error ? <p role="alert" className="border border-red-300/30 bg-red-300/10 px-4 py-3 text-sm text-red-200">{error}</p> : null}
-      {notice ? <p role="status" className="border border-emerald-300/30 bg-emerald-300/10 px-4 py-3 text-sm text-emerald-200">{notice}</p> : null}
+      {error ? <MensajeAcceso tipo="error">{error}</MensajeAcceso> : null}
+      {notice ? <MensajeAcceso tipo="exito">{notice}</MensajeAcceso> : null}
       <div className="flex justify-end">
         <Button type="submit" loading={isSaving}>Actualizar contraseña</Button>
       </div>

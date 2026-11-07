@@ -1,8 +1,15 @@
-import { Container } from "@/components/ui/Container";
 import { NoteBoard } from "@/modules/notes/components/NoteBoard";
 import { requireUser } from "@/lib/auth";
 
 export default async function NotesPage() {
-	await requireUser();
-	return <Container className="py-12"><p className="mb-3 font-mono text-xs uppercase tracking-[0.3em] text-cyan-300">Módulo core</p><h1 className="text-4xl font-bold tracking-tight">Notas</h1><p className="mt-3 mb-10 text-white/55">Una colección de ejemplo para validar el flujo completo de datos.</p><NoteBoard /></Container>;
+  await requireUser();
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <h1 className="text-2xl font-bold text-texto">Notas</h1>
+        <p className="text-sm text-texto-suave">Notas internas.</p>
+      </div>
+      <NoteBoard />
+    </div>
+  );
 }

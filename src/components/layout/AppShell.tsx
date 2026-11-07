@@ -1,44 +1,26 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { obtenerUsuario } from "@/lib/auth/sesion";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { Container } from "@/components/ui/Container";
+import { NavegacionPanel, type EnlacePanel } from "@/components/layout/NavegacionPanel";
 
+/** Marco del panel con el diseño del inventario: barra cereza arriba y contenido sobre fondo claro. */
 export async function AppShell({ children }: { children: ReactNode }) {
   const user = await getCurrentUser();
   const usuarioInventario = user ? await obtenerUsuario().catch(() => null) : null;
-  const linkClass = "block rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white";
+
+  const enlaces: EnlacePanel[] = [
+    { href: "/dashboard", texto: "Panel" },
+    ...(usuarioInventario ? [{ href: "/inventario", texto: "Inventario" }] : []),
+    { href: "/notes", texto: "Notas" },
+    { href: "/status", texto: "Estado" },
+    { href: "/password", texto: "Contraseña" },
+    ...(user?.role === "admin" ? [{ href: "/users", texto: "Usuarios" }] : []),
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="border-b border-white/10">
-        <Container className="flex h-16 items-center justify-between gap-4">
-          <Link href="/" className="shrink-0 font-mono text-sm font-bold tracking-[0.25em] text-amber-300">ELCALEÑO</Link>
-          <nav className="flex items-center gap-3 overflow-x-auto text-sm text-white/60 sm:gap-5">
-            <Link href="/dashboard" className="shrink-0 hover:text-white">Panel</Link>
-            {usuarioInventario ? <Link href="/inventario" className="shrink-0 font-semibold text-amber-300 hover:text-white">Inventario</Link> : null}
-            <Link href="/notes" className="shrink-0 hover:text-white">Notas</Link>
-            <Link href="/status" className="shrink-0 hover:text-white">Estado</Link>
-            <Link href="/password" className="shrink-0 hover:text-white">Contraseña</Link>
-            {user?.role === "admin" ? <Link href="/users" className="shrink-0 hover:text-white">Usuarios</Link> : null}
-            <ThemeToggle />
-            <form action="/api/auth/logout" method="post"><button type="submit" className="shrink-0 hover:text-white">Salir</button></form>
-          </nav>
-        </Container>
-      </header>
-      <div className="md:grid md:grid-cols-[220px_1fr]">
-        <aside className="hidden min-h-[calc(100vh-4rem)] border-r border-white/10 p-6 md:block">
-          <p className="mb-4 text-xs uppercase tracking-widest text-white/40">Workspace</p>
-          <Link href="/dashboard" className={linkClass}>Resumen</Link>
-          {usuarioInventario ? <Link href="/inventario" className={linkClass}>Inventario del bar</Link> : null}
-          <Link href="/notes" className={linkClass}>Notas</Link>
-          <Link href="/status" className={linkClass}>Sistema</Link>
-          <Link href="/password" className={linkClass}>Cambiar contraseña</Link>
-          {user?.role === "admin" ? <Link href="/users" className={linkClass}>Usuarios</Link> : null}
-        </aside>
-        <main>{children}</main>
-      </div>
+    <div className="flex min-h-full flex-1 flex-col bg-fondo text-texto">
+      <NavegacionPanel nombre={user?.name ?? user?.email ?? ""} enlaces={enlaces} />
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:px-6">{children}</main>
     </div>
   );
 }
