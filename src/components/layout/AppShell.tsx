@@ -10,8 +10,12 @@ export async function AppShell({ children }: { children: ReactNode }) {
 
   const enlaces: EnlacePanel[] = [
     { href: "/dashboard", texto: "Panel" },
-    ...(usuarioInventario ? [{ href: "/inventario", texto: "Inventario" }] : []),
-    { href: "/notes", texto: "Notas" },
+    ...(usuarioInventario
+      ? [
+          { href: "/inventario", texto: "Inventario" },
+          { href: "/inventario/sugerencias", texto: "Sugerencias" },
+        ]
+      : []),
     { href: "/status", texto: "Estado" },
     { href: "/password", texto: "Contraseña" },
     ...(user?.role === "admin" ? [{ href: "/users", texto: "Usuarios" }] : []),

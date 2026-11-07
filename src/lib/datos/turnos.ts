@@ -3,6 +3,7 @@
 
 import type { PoolClient } from "pg";
 import { LIMITE_LISTADO } from "@/lib/config/inventario";
+import { borrarObjetos } from "@/lib/db/almacenamiento.mjs";
 import { conTransaccion } from "@/lib/db/conexion";
 import { conErrores, esUuid, filas } from "@/lib/datos/comun";
 import { leerTurno, leerTurnos } from "@/lib/datos/lecturas";
@@ -202,6 +203,33 @@ export async function devolverTurno(turnoId: string, rol: Rol): Promise<TurnoDet
 export async function obtenerTurno(turnoId: string, rol: Rol): Promise<TurnoDetalle> {
   if (!esUuid(turnoId)) throw new ErrorDeNegocio("TURNO_NO_ENCONTRADO");
   return leerTurnoObligatorio(null, turnoId, rol);
+}
+
+/**
+ * Elimina el turno con su planilla y sus fotos (solo administrador, pedido del estudiante).
+ * Las facturas de compra asociadas se conservan sin turno (ON DELETE SET NULL).
+ * El inventario actual y el inicial sugerido vuelven a tomar el turno anterior.
+ */
+export async function eliminarTurno(turnoId: string): Promise<{ nombre: string; fecha: string; fotos: number }> {
+  if (!esUuid(turnoId)) throw new ErrorDeNegocio("TURNO_NO_ENCONTRADO");
+  const resultado = await conErrores(() =>
+    conTransaccion(async (tx) => {
+      const [turno] = await filas<{ nombre: string; fecha: string }>(
+        tx,
+        "select nombre, fecha from turnos where id = $1 for update",
+        [turnoId],
+      );
+      if (!turno) throw new ErrorDeNegocio("TURNO_NO_ENCONTRADO");
+      const fotos = await filas<{ ruta: string }>(tx, "select ruta from fotos_turno where turno_id = $1", [turnoId]);
+      await filas(tx, "delete from turnos where id = $1", [turnoId]);
+      return { ...turno, rutas: fotos.map((f) => f.ruta) };
+    }),
+  );
+  // Los archivos de Storage no se borran en cascada: se quitan después de confirmar la transacción.
+  if (resultado.rutas.length > 0) {
+    await borrarObjetos(resultado.rutas).catch((e) => console.error("[inventario] no se pudieron borrar las fotos del turno eliminado", e));
+  }
+  return { nombre: resultado.nombre, fecha: resultado.fecha, fotos: resultado.rutas.length };
 }
 
 /** true si existe un turno creado después de este (entonces ya no se puede devolver, RN-12). */

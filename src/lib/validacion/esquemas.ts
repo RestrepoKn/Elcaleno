@@ -13,6 +13,7 @@ import {
   SECCIONES,
 } from "@/lib/config/inventario";
 import { esFechaValida } from "@/lib/reglas/fechas";
+import { CATEGORIAS_SUGERENCIA, MENSAJE_MAXIMO, MENSAJE_MINIMO } from "@/lib/reglas/sugerencias";
 
 // Piezas comunes
 const texto = (maximo: number) => z.string().trim().min(1).max(maximo);
@@ -119,3 +120,12 @@ export const esquemaFactura = z.object({
   turnoId: z.uuid().optional(),
 });
 export type EntradaFactura = z.infer<typeof esquemaFactura>;
+
+// Buzón de sugerencias (M5)
+export const esquemaSugerencia = z.object({
+  categoria: z.enum(CATEGORIAS_SUGERENCIA).default("sugerencia"),
+  mensaje: z.string().trim().min(MENSAJE_MINIMO).max(MENSAJE_MAXIMO),
+});
+export type EntradaSugerencia = z.infer<typeof esquemaSugerencia>;
+
+export const esquemaLecturaSugerencia = z.object({ leida: z.boolean() }).strict();

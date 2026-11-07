@@ -18,6 +18,7 @@ export type CodigoError =
   | "FACTURA_DUPLICADA"
   | "FOTO_INVALIDA"
   | "FOTO_NO_ENCONTRADA"
+  | "SUGERENCIA_NO_ENCONTRADA"
   | "ERROR_INTERNO";
 
 export const MENSAJES: Record<CodigoError, string> = {
@@ -38,6 +39,7 @@ export const MENSAJES: Record<CodigoError, string> = {
   FACTURA_DUPLICADA: "Ya existe una factura con ese número para ese producto.",
   FOTO_INVALIDA: "La foto debe ser JPG, PNG o WEBP y pesar máximo 4 MB.",
   FOTO_NO_ENCONTRADA: "La foto no existe.",
+  SUGERENCIA_NO_ENCONTRADA: "La sugerencia no existe.",
   ERROR_INTERNO: "Ocurrió un error inesperado. Intente de nuevo.",
 };
 
@@ -59,6 +61,7 @@ export const ESTADO_HTTP: Record<CodigoError, number> = {
   FACTURA_DUPLICADA: 409,
   FOTO_INVALIDA: 400,
   FOTO_NO_ENCONTRADA: 404,
+  SUGERENCIA_NO_ENCONTRADA: 404,
   ERROR_INTERNO: 500,
 };
 

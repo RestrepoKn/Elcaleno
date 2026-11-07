@@ -13,6 +13,7 @@ const ENLACES: Enlace[] = [
   { href: "/inventario/turnos", texto: "Historial", soloAdministrador: true },
   { href: "/inventario/cocina", texto: "Cocina" },
   { href: "/inventario/facturas", texto: "Facturas", soloAdministrador: true },
+  { href: "/inventario/sugerencias", texto: "Sugerencias" },
 ];
 
 function estaActivo(ruta: string, href: string): boolean {
@@ -20,7 +21,7 @@ function estaActivo(ruta: string, href: string): boolean {
   return ruta === href || ruta.startsWith(`${href}/`);
 }
 
-export function NavegacionInventario({ email, rol }: { email: string; rol: Rol }) {
+export function NavegacionInventario({ email, rol, sugerenciasSinLeer = 0 }: { email: string; rol: Rol; sugerenciasSinLeer?: number }) {
   const ruta = usePathname();
   const visibles = ENLACES.filter((e) => !e.soloAdministrador || rol === "administrador");
 
@@ -70,6 +71,12 @@ export function NavegacionInventario({ email, rol }: { email: string; rol: Rol }
                     ${activo ? "border-white text-white" : "border-transparent text-white/80 hover:text-white"}`}
                 >
                   {e.texto}
+                  {e.href === "/inventario/sugerencias" && sugerenciasSinLeer > 0 ? (
+                    <span className="ml-1.5 rounded-full bg-white px-1.5 text-xs font-bold text-primario tabular-nums">
+                      {sugerenciasSinLeer}
+                      <span className="sr-only"> sin leer</span>
+                    </span>
+                  ) : null}
                 </Link>
               </li>
             );

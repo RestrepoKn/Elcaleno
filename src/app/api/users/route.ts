@@ -3,15 +3,17 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/password";
 import { getSupabasePool } from "@/lib/supabase-db";
+import { ACCESOS_INVENTARIO, asignarAccesoInventario, type AccesoInventario } from "@/lib/acceso-inventario";
 
 const createUserSchema = z.object({
   name: z.string().trim().min(1).max(120),
   email: z.string().trim().email().max(254).transform((email) => email.toLowerCase()),
   password: z.string().min(8).max(128),
   role: z.enum(["admin", "user"]).default("user"),
+  inventario: z.enum(ACCESOS_INVENTARIO).default("encargado"),
 });
 
-type ManagedUser = { id: string; name: string; email: string; role: "admin" | "user"; active: boolean; createdAt: string };
+type ManagedUser = { id: string; name: string; email: string; role: "admin" | "user"; active: boolean; createdAt: string; inventario: AccesoInventario };
 
 async function authorizationFailure() {
   const user = await getCurrentUser();
@@ -32,9 +34,11 @@ export async function GET() {
 
   try {
     const result = await getSupabasePool().query<ManagedUser>(
-      `select id::text, name, email, role, active, created_at::text as "createdAt"
-       from public.users
-       order by created_at desc`,
+      `select u.id::text, u.name, u.email, u.role, u.active, u.created_at::text as "createdAt",
+              coalesce(a.rol, 'ninguno') as inventario
+       from public.users u
+       left join public.acceso a on lower(btrim(a.email)) = u.email
+       order by u.created_at desc`,
     );
     return NextResponse.json({ users: result.rows });
   } catch (error) {
@@ -57,15 +61,27 @@ export async function POST(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: "Revisa nombre, correo, rol y contraseña (mínimo 8 caracteres)." }, { status: 400 });
 
   try {
-    const { name, email, password, role } = parsed.data;
+    const { name, email, password, role, inventario } = parsed.data;
     const passwordHash = await hashPassword(password);
-    const result = await getSupabasePool().query<ManagedUser>(
-      `insert into public.users (name, email, password_hash, role)
-       values ($1, $2, $3, $4)
-       returning id::text, name, email, role, active, created_at::text as "createdAt"`,
-      [name, email, passwordHash, role],
-    );
-    return NextResponse.json({ user: result.rows[0] }, { status: 201 });
+    // La cuenta y su permiso del inventario se guardan juntos.
+    const client = await getSupabasePool().connect();
+    try {
+      await client.query("begin");
+      const result = await client.query<Omit<ManagedUser, "inventario">>(
+        `insert into public.users (name, email, password_hash, role)
+         values ($1, $2, $3, $4)
+         returning id::text, name, email, role, active, created_at::text as "createdAt"`,
+        [name, email, passwordHash, role],
+      );
+      await asignarAccesoInventario(client, email, inventario);
+      await client.query("commit");
+      return NextResponse.json({ user: { ...result.rows[0], inventario } }, { status: 201 });
+    } catch (error) {
+      await client.query("rollback").catch(() => {});
+      throw error;
+    } finally {
+      client.release();
+    }
   } catch (error) {
     return databaseError(error);
   }

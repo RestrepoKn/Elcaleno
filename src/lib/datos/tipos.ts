@@ -164,6 +164,18 @@ export type FotoTurno = {
   createdAt: string;
 };
 
+/** Buzón de sugerencias (M5). */
+export type Sugerencia = {
+  id: number;
+  autorEmail: string;
+  autorNombre: string;
+  categoria: "sugerencia" | "problema" | "pedido" | "otro";
+  mensaje: string;
+  leida: boolean;
+  leidaAt: string | null;
+  createdAt: string;
+};
+
 export type FiltrosInventario = {
   seccion?: Seccion | undefined;
   soloPorReponer?: boolean | undefined;

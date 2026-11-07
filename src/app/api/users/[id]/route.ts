@@ -3,6 +3,12 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth";
 import { hashPassword } from "@/lib/password";
 import { getSupabasePool } from "@/lib/supabase-db";
+import {
+  ACCESOS_INVENTARIO,
+  asignarAccesoInventario,
+  esUltimoAdministradorInventario,
+  moverAccesoInventario,
+} from "@/lib/acceso-inventario";
 
 const updateUserSchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
@@ -10,10 +16,11 @@ const updateUserSchema = z.object({
   password: z.string().min(8).max(128).optional(),
   role: z.enum(["admin", "user"]).optional(),
   active: z.boolean().optional(),
+  inventario: z.enum(ACCESOS_INVENTARIO).optional(),
 }).refine((value) => Object.values(value).some((field) => field !== undefined), { message: "Incluye al menos un campo para actualizar." });
 
-type ExistingUser = { id: string; role: "admin" | "user"; active: boolean };
-type ManagedUser = { id: string; name: string; email: string; role: "admin" | "user"; active: boolean; createdAt: string };
+type ExistingUser = { id: string; email: string; role: "admin" | "user"; active: boolean };
+type ManagedUser = { id: string; name: string; email: string; role: "admin" | "user"; active: boolean; createdAt: string; inventario: string };
 type Context = { params: Promise<{ id: string }> };
 
 async function authorizationFailure() {
@@ -50,7 +57,7 @@ export async function PATCH(request: Request, { params }: Context) {
 
   try {
     const existingResult = await pool.query<ExistingUser>(
-      "select id::text, role, active from public.users where id = $1::uuid",
+      "select id::text, email, role, active from public.users where id = $1::uuid",
       [id],
     );
     const existing = existingResult.rows[0];
@@ -65,25 +72,47 @@ export async function PATCH(request: Request, { params }: Context) {
       }
     }
 
+    // Debe quedar al menos un administrador del inventario (igual que en el login).
+    if (input.inventario !== undefined && input.inventario !== "administrador" &&
+        (await esUltimoAdministradorInventario(pool, existing.email))) {
+      return NextResponse.json({ error: "Debe quedar al menos un administrador del inventario." }, { status: 409 });
+    }
+
     const passwordHash = input.password ? await hashPassword(input.password) : null;
-    const result = await pool.query<ManagedUser>(
-      `update public.users
-       set name = coalesce($2, name),
-           email = coalesce($3, email),
-           role = coalesce($4, role),
-           active = coalesce($5, active),
-           password_hash = coalesce($6, password_hash),
-           updated_at = now()
-       where id = $1::uuid
-       returning id::text, name, email, role, active, created_at::text as "createdAt"`,
-      [id, input.name ?? null, input.email ?? null, input.role ?? null, input.active ?? null, passwordHash],
-    );
+    // Cuenta y permiso del inventario en una sola transacción.
+    const client = await pool.connect();
+    let user: Omit<ManagedUser, "inventario"> | undefined;
+    try {
+      await client.query("begin");
+      const result = await client.query<Omit<ManagedUser, "inventario">>(
+        `update public.users
+         set name = coalesce($2, name),
+             email = coalesce($3, email),
+             role = coalesce($4, role),
+             active = coalesce($5, active),
+             password_hash = coalesce($6, password_hash),
+             updated_at = now()
+         where id = $1::uuid
+         returning id::text, name, email, role, active, created_at::text as "createdAt"`,
+        [id, input.name ?? null, input.email ?? null, input.role ?? null, input.active ?? null, passwordHash],
+      );
+      user = result.rows[0];
+      if (user && input.email) await moverAccesoInventario(client, existing.email, user.email);
+      if (user && input.inventario !== undefined) await asignarAccesoInventario(client, user.email, input.inventario);
+      await client.query("commit");
+    } catch (error) {
+      await client.query("rollback").catch(() => {});
+      throw error;
+    } finally {
+      client.release();
+    }
 
     if (input.active === false || input.password) {
       await pool.query("delete from public.user_sessions where user_id = $1::uuid", [id]);
     }
 
-    return NextResponse.json({ user: result.rows[0] });
+    const acceso = await pool.query<{ rol: string }>("select rol from public.acceso where lower(btrim(email)) = $1", [user?.email ?? ""]);
+    return NextResponse.json({ user: user ? { ...user, inventario: acceso.rows[0]?.rol ?? "ninguno" } : undefined });
   } catch (error) {
     return databaseError(error);
   }

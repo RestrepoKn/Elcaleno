@@ -93,6 +93,10 @@ export function LoginPage({ passwordRestablecida = false }: { passwordRestableci
               {isSubmitting ? "Entrando..." : "Entrar"}
             </Button>
           </form>
+          <p className="mt-6 text-center text-sm text-texto-suave">
+            ¿No tienes cuenta?{" "}
+            <Link href="/registro" className={claseEnlaceAcceso}>Crear cuenta</Link>
+          </p>
     </MarcoAcceso>
   );
 }

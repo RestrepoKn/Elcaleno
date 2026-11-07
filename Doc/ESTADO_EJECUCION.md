@@ -286,3 +286,68 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
 - Verificación con `next dev`: las 9 pantallas responden 200 con su contenido. En el HTML solo queda texto blanco sobre fondo cereza (intencional).
 - `npm run type-check`, `npm test` (138), `npm run lint` (0 avisos) y `npm run build`: todo correcto.
 - Pendiente: revisión visual en el celular, porque no hay navegador en esta sesión.
+
+### Crear cuenta desde el login · 2026-11-07
+
+- Pedido del estudiante: crear cuenta desde el login, solo con permiso de usuario y nunca de administrador.
+- `POST /api/auth/registro`:
+  - Nombre, correo (en minúsculas) y contraseña de 8 a 128 caracteres.
+  - **El rol lo fija el servidor:** el esquema no acepta un rol y el SQL inserta `'user'` como literal.
+  - Un correo repetido da 409. Después de crear la cuenta inicia sesión y devuelve el destino (`/dashboard`, porque la cuenta nueva no tiene rol en `acceso`).
+- `/registro` (`RegistroForm` dentro de `MarcoAcceso`), con el enlace "¿No tienes cuenta? Crear cuenta" en el login y "¿Ya tienes cuenta? Inicia sesión" de vuelta.
+- La cuenta nueva **no tiene acceso al inventario** hasta que el administrador le asigne un rol en `acceso`. Hoy eso se hace con `npm run db:usuario`; la pantalla de Usuarios no lo maneja.
+- Pruebas: `src/app/api/auth/registro/route.test.ts` (3 casos: rol siempre `user` aunque se pida `admin`, datos inválidos, correo duplicado). Total: 141.
+- Verificación en vivo con `next dev` y una cuenta temporal (borrada): 11 casos.
+  - Enlace en el login y página `/registro`.
+  - Registro pidiendo `role=admin`: 201 con sesión, y en la base quedó `user`, sin fila en `acceso`.
+  - Correo repetido en mayúsculas: 409.
+  - El panel avisa que no tiene inventario y no muestra Usuarios; `/inventario` dice "Sin acceso al inventario".
+  - API de usuarios: 403. Puede volver a iniciar sesión normalmente.
+- `/users` responde 200 para un usuario normal, pero sin el formulario y con `NEXT_REDIRECT;replace;/dashboard`. Next redirige así cuando la página ya empezó a enviarse. Es comportamiento previo de `requireAdmin()` y no expone datos.
+- Riesgos del registro abierto (para decidir):
+  - Cualquiera con la dirección puede crear una cuenta de usuario y ver Notas y Estado en el panel; el inventario sigue cerrado.
+  - No hay verificación del correo ni límite de intentos.
+- `npm run type-check`, `npm test` (141), `npm run lint` y `npm run build`: todo correcto.
+
+### Registro como encargado, acceso en Usuarios y eliminar turnos · 2026-11-07
+
+- Pedido del estudiante: las cuentas creadas desde el login entran al inventario como encargado, y el administrador puede eliminar turnos en el Historial.
+- `src/lib/acceso-inventario.ts`: `asignarAccesoInventario` (ninguno, encargado o administrador), `moverAccesoInventario` (cuando cambia el correo) y `esUltimoAdministradorInventario`.
+- Registro (`/api/auth/registro`): en una transacción crea la cuenta `user` y su acceso `encargado`; el destino pasa a `/inventario`. Pruebas actualizadas (3).
+- Usuarios (`/api/users`, `/api/users/[id]`, `UserManagement`):
+  - La columna "Inventario" y el campo "Acceso al inventario" se cambian en la misma transacción que la cuenta.
+  - Al crear, Encargado por defecto. Al cambiar el correo, el permiso se mueve.
+  - Debe quedar al menos un administrador del inventario (409).
+- Eliminar turno:
+  - `eliminarTurno(turnoId)` en `lib/datos/turnos.ts` borra el turno con sus filas y fotos, en cascada, y después sus archivos de Storage. Las facturas de compra quedan sin turno (`SET NULL`).
+  - `DELETE /api/inventario/turnos/[id]`, solo administrador.
+  - `EliminarTurno` (botón con confirmación) en el Historial, en móvil y escritorio, y en el detalle del turno.
+  - Cambio frente al plan: RN-14 decía que un turno cerrado es inmutable. A pedido del estudiante, el administrador puede eliminarlo; la confirmación avisa que se borra el registro oficial y que el inventario vuelve a tomar el turno anterior.
+- Verificación en vivo con `next dev` (cuentas y turno temporales, borrados; no se tocó el turno "Completo" del estudiante): 16 de 16 OK.
+  - Registro: el destino es `/inventario`, la cuenta queda `user` y `encargado`, y entra sin Historial.
+  - Usuarios: la lista trae el acceso; quitarlo deja "Sin acceso"; se puede devolver; al crear desde Usuarios queda Encargado; cambiar el correo mueve el permiso; un encargado no puede darse permisos (403).
+  - Eliminar: el turno temporal tenía 1 fila y 1 foto. El botón aparece en el Historial; el encargado recibe 403; el administrador elimina (200, 1 foto). Quedan 0 filas y 0 archivos en Storage, y consultar el turno da 404.
+- `npm run type-check`, `npm test` (141), `npm run lint` y `npm run build`: todo correcto.
+
+### Buzón de sugerencias (reemplaza Notas) · 2026-11-07
+
+- Problema reportado: "Notas" no funcionaba. Causa: guardaba en `data/note.json` con `json-db`, y en Vercel el sistema de archivos no persiste (plan, sección 2).
+- Pedido del estudiante: convertirlo en un buzón de sugerencias. Los encargados escriben y el administrador lee todas.
+- M5 `20261107130000_inventario_sugerencias.sql`: tabla `sugerencias` con autor, categoría (sugerencia, problema, pedido u otro), mensaje de 3 a 1.000 caracteres, y leída y `leida_at`, con un CHECK que los mantiene coherentes. RLS activo y permisos revocados. Aplicada.
+- Reglas `lib/reglas/sugerencias.ts` (2 pruebas). Datos `lib/datos/sugerencias.ts`. Código nuevo `SUGERENCIA_NO_ENCONTRADA` (404).
+- API:
+  - `GET/POST /api/inventario/sugerencias`: el encargado ve solo las suyas; el administrador, todas, con `?soloNoLeidas=true`.
+  - `PATCH/DELETE /api/inventario/sugerencias/[id]`: solo el administrador.
+- Pantalla `/inventario/sugerencias`:
+  - Encargado: formulario y "Mis sugerencias", con el estado Leída o Sin leer.
+  - Administrador: bandeja "Sin leer / Todas", con autor, fecha y tipo; marcar como leída, sin leer, o eliminar.
+- Navegación: "Sugerencias" en la barra del inventario, con el contador de sin leer para el administrador. En el panel, "Notas" se reemplazó por "Sugerencias"; `/notes` redirige al buzón y la portada tiene la tarjeta "Buzón de sugerencias". `NoteBoard` y `json-db` quedan sin uso.
+- Las sugerencias no son anónimas: el administrador ve el autor.
+- Verificación en vivo con `next dev` (dos encargados temporales, borrados): 13 de 13.
+  - Ambos envían; los datos inválidos dan 400.
+  - Cada encargado ve solo las suyas; el administrador ve todas; la barra muestra el contador.
+  - La bandeja muestra el mensaje y el autor.
+  - El encargado no puede marcar ni borrar (403); el administrador marca como leída y el encargado lo ve.
+  - Eliminar da 200, y repetirlo da 404. `/notes` lleva al buzón; el panel muestra la tarjeta.
+  - Las comprobaciones 6 y 7 fallaron al principio porque la frase buscada estaba partida en varios elementos HTML; con el texto visible pasan.
+- `npm run type-check`, `npm test` (143), `npm run lint` y `npm run build`: todo correcto.

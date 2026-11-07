@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { NavegacionInventario } from "@/components/inventario/NavegacionInventario";
 import { EstadoVacio } from "@/components/ui/EstadoVacio";
 import { obtenerSesion, obtenerUsuario } from "@/lib/auth/sesion";
+import { contarSugerenciasNoLeidas } from "@/lib/inventario/dataService";
 
 export const metadata: Metadata = {
   title: "Inventario del bar",
@@ -15,12 +16,14 @@ export default async function LayoutInventario({ children }: { children: ReactNo
   const email = await obtenerSesion();
   if (!email) redirect("/login");
   const usuario = await obtenerUsuario();
+  // El administrador ve en la barra cuántas sugerencias tiene sin leer.
+  const sinLeer = usuario?.rol === "administrador" ? await contarSugerenciasNoLeidas().catch(() => 0) : 0;
 
   return (
     <div className="flex min-h-full flex-1 flex-col bg-fondo text-texto">
       {usuario ? (
         <>
-          <NavegacionInventario email={usuario.email} rol={usuario.rol} />
+          <NavegacionInventario email={usuario.email} rol={usuario.rol} sugerenciasSinLeer={sinLeer} />
           <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6">{children}</main>
         </>
       ) : (

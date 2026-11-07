@@ -15,6 +15,7 @@ export {
   abrirTurno,
   cerrarTurno,
   devolverTurno,
+  eliminarTurno,
   entregarTurno,
   listarTurnos,
   obtenerTurno,
@@ -36,6 +37,16 @@ export { inventarioActual } from "@/lib/datos/inventario";
 export { listarCocina, productosDeCocina, registrarTurnoCocina } from "@/lib/datos/cocina";
 export { listarFacturas, registrarFactura } from "@/lib/datos/facturas";
 
+// Buzón de sugerencias (M5)
+export {
+  contarSugerenciasNoLeidas,
+  crearSugerencia,
+  eliminarSugerencia,
+  listarMisSugerencias,
+  listarSugerencias,
+  marcarSugerencia,
+} from "@/lib/datos/sugerencias";
+
 // Fotos de facturas del turno (M4)
 export { borrarFoto, listarFotos, obtenerArchivoFoto, subirFoto } from "@/lib/datos/fotos";
 
@@ -48,6 +59,7 @@ export type {
   FacturaConAumento,
   FotoTurno,
   RegistroCocina,
+  Sugerencia,
   DatosTurno,
   FilaInventario,
   Finanzas,

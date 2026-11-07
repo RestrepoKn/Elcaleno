@@ -27,6 +27,11 @@ export default async function DashboardPage() {
     ? [
         { href: "/inventario", titulo: "Inventario actual", descripcion: "Existencias de bar y helados con sus alertas de reposición." },
         { href: "/inventario/turno", titulo: "Turno actual", descripcion: "Abrir el turno, llenar la planilla y fotografiar las facturas." },
+        {
+          href: "/inventario/sugerencias",
+          titulo: "Buzón de sugerencias",
+          descripcion: esAdministrador ? "Leer las ideas, problemas y pedidos de los encargados." : "Enviar ideas, problemas o pedidos al administrador.",
+        },
         ...(esAdministrador
           ? [
               { href: "/inventario/turnos", titulo: "Historial", descripcion: "Revisar, cerrar turnos y ver el resultado neto." },
@@ -39,7 +44,6 @@ export default async function DashboardPage() {
   const accesosCuenta: Acceso[] = [
     { href: "/password", titulo: "Cambiar contraseña", descripcion: "Actualice su contraseña de acceso." },
     ...(user.role === "admin" ? [{ href: "/users", titulo: "Usuarios", descripcion: "Cuentas y permisos de acceso." }] : []),
-    { href: "/notes", titulo: "Notas", descripcion: "Notas internas." },
     { href: "/status", titulo: "Estado del sistema", descripcion: "Salud y versión de la aplicación." },
   ];
 

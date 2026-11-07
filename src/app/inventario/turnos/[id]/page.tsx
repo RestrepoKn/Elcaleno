@@ -6,6 +6,7 @@ import { RevisionTurno } from "@/components/inventario/RevisionTurno";
 import { Aviso } from "@/components/ui/Aviso";
 import { obtenerUsuario } from "@/lib/auth/sesion";
 import { formatearFecha, formatearFechaHora, formatearPesos } from "@/lib/formato";
+import { EliminarTurno } from "@/components/inventario/EliminarTurno";
 import { FotosTurno } from "@/components/inventario/FotosTurno";
 import { listarFotos, obtenerTurno, tieneTurnoPosterior, type TurnoDetalle } from "@/lib/inventario/dataService";
 import { ErrorDeNegocio } from "@/lib/reglas/errores";
@@ -47,7 +48,12 @@ export default async function PaginaDetalleTurno({ params }: { params: Promise<{
             {turno.cerradoAt ? ` · Cerrado: ${formatearFechaHora(turno.cerradoAt)}` : ""}
           </p>
         </div>
-        <InsigniaEstadoTurno estado={turno.estado} />
+        <div className="flex items-center gap-2">
+          <InsigniaEstadoTurno estado={turno.estado} />
+          {esAdministrador ? (
+            <EliminarTurno turnoId={turno.id} nombre={turno.nombre} fecha={turno.fecha} estado={turno.estado} />
+          ) : null}
+        </div>
       </div>
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">

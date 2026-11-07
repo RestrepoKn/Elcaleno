@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EliminarTurno } from "@/components/inventario/EliminarTurno";
 import { InsigniaEstadoTurno } from "@/components/inventario/InsigniaEstadoTurno";
 import type { TurnoResumen } from "@/lib/datos/tipos";
 import { formatearFecha, formatearPesos } from "@/lib/formato";
@@ -15,11 +16,11 @@ export function TablaHistorial({ turnos }: { turnos: TurnoResumen[] }) {
       {/* Móvil */}
       <ul className="flex flex-col gap-2 md:hidden">
         {turnos.map((t) => (
-          <li key={t.id}>
+          <li key={t.id} className="overflow-hidden rounded-xl border border-borde bg-superficie">
             <Link
               href={`/inventario/turnos/${t.id}`}
-              className="flex flex-col gap-2 rounded-xl border border-borde bg-superficie p-4 hover:bg-primario-suave/40
-                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primario"
+              className="flex flex-col gap-2 p-4 hover:bg-primario-suave/40
+                focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primario"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold text-texto">{t.nombre}</p>
@@ -32,6 +33,9 @@ export function TablaHistorial({ turnos }: { turnos: TurnoResumen[] }) {
                 <div><dt className="text-xs text-texto-suave">Neto</dt><dd className="font-semibold"><Neto valor={t.resultadoNetoCierre ?? t.resultadoNeto} /></dd></div>
               </dl>
             </Link>
+            <div className="flex justify-end border-t border-borde px-2 py-1">
+              <EliminarTurno turnoId={t.id} nombre={t.nombre} fecha={t.fecha} estado={t.estado} />
+            </div>
           </li>
         ))}
       </ul>
@@ -49,6 +53,7 @@ export function TablaHistorial({ turnos }: { turnos: TurnoResumen[] }) {
               <th scope="col" className="px-4 py-3 text-right font-semibold">Venta total</th>
               <th scope="col" className="px-4 py-3 text-right font-semibold">A cancelar</th>
               <th scope="col" className="px-4 py-3 text-right font-semibold">Resultado neto</th>
+              <th scope="col" className="px-4 py-3 text-right font-semibold"><span className="sr-only">Acciones</span></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-borde tabular-nums">
@@ -67,6 +72,9 @@ export function TablaHistorial({ turnos }: { turnos: TurnoResumen[] }) {
                   {formatearPesos(t.totalACancelar)}
                 </td>
                 <td className="px-4 py-3 text-right font-semibold"><Neto valor={t.resultadoNetoCierre ?? t.resultadoNeto} /></td>
+                <td className="px-2 py-1 text-right">
+                  <EliminarTurno turnoId={t.id} nombre={t.nombre} fecha={t.fecha} estado={t.estado} />
+                </td>
               </tr>
             ))}
           </tbody>
