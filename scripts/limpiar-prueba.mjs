@@ -1,5 +1,6 @@
 // Borra los datos de prueba ("Prueba …") y de demostración ("Demo …") del inventario.
-// Uso: npm run db:limpiar
+// Uso: npm run db:limpiar                   (prueba y demostración)
+//      npm run db:limpiar -- --solo-prueba   (conserva la demostración)
 //
 // - Turnos cuyo nombre empieza por "Prueba" o "Demo" (sus filas se borran en cascada).
 // - Productos "Prueba …" o "Demo …" sin filas en otros turnos; si aún tienen filas en un turno real, se desactivan.
@@ -75,7 +76,8 @@ async function principal() {
   const pool = crearPoolScripts();
   const cliente = await pool.connect();
   try {
-    const r = await limpiarDatosDePrueba(cliente, { incluirDemo: true });
+    // npm run db:limpiar -- --solo-prueba  → conserva los datos de demostración.
+    const r = await limpiarDatosDePrueba(cliente, { incluirDemo: !process.argv.includes("--solo-prueba") });
     console.log(
       `Limpieza: ${r.turnos} turnos, ${r.productosBorrados} productos borrados, ` +
         `${r.productosDesactivados} desactivados, ${r.usuarios} usuarios demo.`,

@@ -7,7 +7,7 @@
 | P02 | 2 · Reglas | Completado (adelantado; no depende de la base) |
 | P03 | 3 · Servidor | Completado |
 | P04 | 4 · Datos | Completado (la fase 4 sigue abierta hasta P05) |
-| P05 | 4 · API | Pendiente |
+| P05 | 4 · API | Completado (fase 4 cerrada) |
 | P06 | 5 · Interfaz base | Pendiente |
 | P07 | 5 · Turno | Pendiente |
 | P08 | 5 y 6 · Cierre y aceptación | Pendiente |
@@ -119,3 +119,12 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
 ```
 
 `npm run type-check`, `npm test` (123 pruebas), `npm run lint` y `npm run build`: todo correcto.
+
+### P05 · 2026-11-07
+
+- Rutas de la tabla 11.3 (módulo mínimo) en `src/app/api/inventario/`. Detalle en `Doc/checkpoints/FASE_4_COMPLETADA.md`.
+- `src/lib/http/consulta.ts`: `leerConsulta` (query string) y `ContextoRuta` (params como Promise).
+- `scripts/verificar-api.ps1`: verificación en vivo con los dos roles. Dio 37 de 37 OK.
+- `db:limpiar -- --solo-prueba`: limpia solo los datos "Prueba …" y conserva la demostración.
+- Diagnóstico de producción: `registrarConexionElegida` (en `variables-conexion.mjs`) registra una vez por proceso la variable, el ref del proyecto y el puerto, nunca la cadena. La usan `conexion.ts` y `supabase-db.ts`.
+- Pendiente: el login publicado responde 401 aunque Vercel ya solo tiene `POSTGRES_URL` y `POSTGRES_URL_NON_POOLING`. Con este registro, los logs de Vercel mostrarán qué proyecto usa producción.

@@ -38,5 +38,24 @@ export function urlConexionPostgres(opciones = {}) {
   return primeraDefinida(orden);
 }
 
+let conexionRegistrada = false;
+
+/**
+ * Deja en el log (una vez por proceso) qué variable y qué proyecto de Supabase se usan.
+ * Solo muestra el nombre de la variable, el ref del proyecto (público) y el puerto; nunca la cadena.
+ * @param {{ nombre: string, valor: string }} conexion
+ */
+export function registrarConexionElegida(conexion) {
+  if (conexionRegistrada) return;
+  conexionRegistrada = true;
+  try {
+    const url = new URL(conexion.valor);
+    const ref = decodeURIComponent(url.username).split(".")[1] ?? url.hostname.split(".")[0];
+    console.info(`[db] conexión: ${conexion.nombre} · proyecto ${ref} · puerto ${url.port || "5432"}`);
+  } catch {
+    console.info(`[db] conexión: ${conexion.nombre} (URL con formato inválido)`);
+  }
+}
+
 export const MENSAJE_FALTA_CONEXION =
   "Falta la conexión a Postgres: configura POSTGRES_URL (o ELCALENO_POSTGRES_URL) en .env.local.";

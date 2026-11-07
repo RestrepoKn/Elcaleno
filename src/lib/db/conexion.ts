@@ -3,7 +3,11 @@
 // Los parsers de tipos se aplican solo a este pool: no cambian las consultas de otros módulos.
 
 import { Pool, types, type CustomTypesConfig, type PoolClient, type QueryResultRow } from "pg";
-import { MENSAJE_FALTA_CONEXION, urlConexionPostgres } from "@/lib/db/variables-conexion.mjs";
+import {
+  MENSAJE_FALTA_CONEXION,
+  registrarConexionElegida,
+  urlConexionPostgres,
+} from "@/lib/db/variables-conexion.mjs";
 
 const OID_DATE = 1082;
 const OID_TIMESTAMP = 1114;
@@ -40,6 +44,7 @@ function obtenerPool(): Pool {
 
   const conexion = urlConexionPostgres({ preferirSesion: process.env.NODE_ENV !== "production" });
   if (!conexion) throw new Error(MENSAJE_FALTA_CONEXION);
+  registrarConexionElegida(conexion);
 
   const pool = new Pool({
     connectionString: limpiarUrlConexion(conexion.valor),
