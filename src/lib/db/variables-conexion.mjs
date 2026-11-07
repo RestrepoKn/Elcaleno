@@ -2,15 +2,15 @@
 // La usan la app (login e inventario) y los scripts de scripts/.
 //
 // Acepta tres nombres para cada variable, en este orden:
-//   ELCALENO_    prefijo actual de la integración de Supabase en Vercel
-//   ELCALENOSM_  prefijo anterior
-//   (sin prefijo) como queda al copiar el bloque de Supabase a .env.local
+//   (sin prefijo) integración actual de Supabase en Vercel (desde 2026-11-07) y .env.local
+//   ELCALENO_    por si la integración se reconecta con ese prefijo
+//   ELCALENOSM_  integración anterior; su base quedó inaccesible, por eso va al final
 //
 // preferirSesion = true usa primero el session pooler (puerto 5432, *_URL_NON_POOLING):
 // conviene para scripts y para `next dev`. En producción (Vercel, serverless) se usa primero
 // el transaction pooler (puerto 6543, *_URL).
 
-const PREFIJOS = ["ELCALENO_", "ELCALENOSM_", ""];
+const PREFIJOS = ["", "ELCALENO_", "ELCALENOSM_"];
 const AGRUPADA = ["POSTGRES_URL", "POSTGRES_PRISMA_URL"];
 const SESION = ["POSTGRES_URL_NON_POOLING"];
 
@@ -39,4 +39,4 @@ export function urlConexionPostgres(opciones = {}) {
 }
 
 export const MENSAJE_FALTA_CONEXION =
-  "Falta la conexión a Postgres: configura ELCALENO_POSTGRES_URL (o ELCALENOSM_POSTGRES_URL, o POSTGRES_URL) en .env.local.";
+  "Falta la conexión a Postgres: configura POSTGRES_URL (o ELCALENO_POSTGRES_URL) en .env.local.";
