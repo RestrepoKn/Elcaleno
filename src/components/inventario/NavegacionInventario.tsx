@@ -35,6 +35,12 @@ export function NavegacionInventario({ email, rol }: { email: string; rol: Rol }
           <span className="hidden max-w-[16rem] truncate text-white/80 sm:inline" title={email}>
             {email}
           </span>
+          <Link
+            href="/dashboard"
+            className="min-h-9 content-center rounded-lg px-2 font-semibold text-white/85 hover:bg-white/15 hover:text-white focus-visible:outline-2 focus-visible:outline-white"
+          >
+            Panel
+          </Link>
           <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold">
             {rol === "administrador" ? "Administrador" : "Encargado"}
           </span>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createUserSession } from "@/lib/auth";
+import { destinoTrasLogin } from "@/lib/auth/sesion";
 
 const loginSchema = z.object({
   email: z.string().email().max(254),
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ success: false, error: "Correo o contraseña incorrectos." }, { status: 401 });
     }
-    return NextResponse.json({ success: true, user });
+    return NextResponse.json({ success: true, user, destino: await destinoTrasLogin(user.email) });
   } catch {
     return NextResponse.json({ success: false, error: "No se pudo iniciar sesión." }, { status: 500 });
   }

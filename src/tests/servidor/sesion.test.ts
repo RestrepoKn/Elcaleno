@@ -52,3 +52,21 @@ describe("sesión del inventario", () => {
     await expect(exigirRol("encargado")).resolves.toMatchObject({ rol: "administrador" });
   });
 });
+
+describe("destino después del login", () => {
+  it("con rol en acceso va al inventario; sin rol, al panel", async () => {
+    const { destinoTrasLogin } = await import("@/lib/auth/sesion");
+    rolDeCorreoMock.mockResolvedValueOnce("encargado");
+    expect(await destinoTrasLogin("bar@correo.com")).toBe("/inventario");
+    rolDeCorreoMock.mockResolvedValueOnce(null);
+    expect(await destinoTrasLogin("otro@correo.com")).toBe("/dashboard");
+  });
+
+  it("si la consulta del rol falla, el login no se bloquea: va al panel", async () => {
+    const { destinoTrasLogin } = await import("@/lib/auth/sesion");
+    const consola = vi.spyOn(console, "error").mockImplementation(() => {});
+    rolDeCorreoMock.mockRejectedValueOnce(new Error("sin conexión"));
+    expect(await destinoTrasLogin("bar@correo.com")).toBe("/dashboard");
+    consola.mockRestore();
+  });
+});

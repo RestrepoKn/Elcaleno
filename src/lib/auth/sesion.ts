@@ -23,6 +23,19 @@ export const obtenerUsuario = cache(async function obtenerUsuario(): Promise<Usu
   return rol ? { email, rol } : null;
 });
 
+/**
+ * A dónde ir después de iniciar sesión: al inventario si el correo tiene rol en acceso; si no, al panel.
+ * Si la consulta falla, no se bloquea el login: se va al panel.
+ */
+export async function destinoTrasLogin(email: string): Promise<"/inventario" | "/dashboard"> {
+  try {
+    return (await rolDeCorreo(email)) ? "/inventario" : "/dashboard";
+  } catch (error) {
+    console.error("[inventario] no se pudo consultar el rol tras el login", error);
+    return "/dashboard";
+  }
+}
+
 /** Lanza NO_AUTORIZADO si no hay sesión o el correo no tiene rol. */
 export async function exigirSesion(): Promise<UsuarioInventario> {
   const usuario = await obtenerUsuario();

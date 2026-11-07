@@ -34,12 +34,13 @@ export function LoginPage({ passwordRestablecida = false }: { passwordRestableci
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim(), password }),
       });
-      const result = await response.json() as { error?: string };
+      const result = await response.json() as { error?: string; destino?: string };
       if (!response.ok) {
         setErrors({ password: result.error ?? "Correo o contraseña incorrectos." });
         return;
       }
-      router.push("/dashboard");
+      // Quien tiene rol en el inventario entra directo a /inventario; el resto, al panel.
+      router.push(result.destino === "/inventario" ? "/inventario" : "/dashboard");
     } catch {
       setErrors({ password: "No se pudo conectar. Inténtalo de nuevo." });
     } finally {

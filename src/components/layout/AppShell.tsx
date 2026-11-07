@@ -1,11 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { obtenerUsuario } from "@/lib/auth/sesion";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { Container } from "@/components/ui/Container";
 
 export async function AppShell({ children }: { children: ReactNode }) {
   const user = await getCurrentUser();
+  const usuarioInventario = user ? await obtenerUsuario().catch(() => null) : null;
   const linkClass = "block rounded-md px-3 py-2 text-sm text-white/70 hover:bg-white/10 hover:text-white";
 
   return (
@@ -15,6 +17,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
           <Link href="/" className="shrink-0 font-mono text-sm font-bold tracking-[0.25em] text-amber-300">ELCALEÑO</Link>
           <nav className="flex items-center gap-3 overflow-x-auto text-sm text-white/60 sm:gap-5">
             <Link href="/dashboard" className="shrink-0 hover:text-white">Panel</Link>
+            {usuarioInventario ? <Link href="/inventario" className="shrink-0 font-semibold text-amber-300 hover:text-white">Inventario</Link> : null}
             <Link href="/notes" className="shrink-0 hover:text-white">Notas</Link>
             <Link href="/status" className="shrink-0 hover:text-white">Estado</Link>
             <Link href="/password" className="shrink-0 hover:text-white">Contraseña</Link>
@@ -28,6 +31,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
         <aside className="hidden min-h-[calc(100vh-4rem)] border-r border-white/10 p-6 md:block">
           <p className="mb-4 text-xs uppercase tracking-widest text-white/40">Workspace</p>
           <Link href="/dashboard" className={linkClass}>Resumen</Link>
+          {usuarioInventario ? <Link href="/inventario" className={linkClass}>Inventario del bar</Link> : null}
           <Link href="/notes" className={linkClass}>Notas</Link>
           <Link href="/status" className={linkClass}>Sistema</Link>
           <Link href="/password" className={linkClass}>Cambiar contraseña</Link>

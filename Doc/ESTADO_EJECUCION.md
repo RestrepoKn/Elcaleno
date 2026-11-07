@@ -159,3 +159,14 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
   - Revisión visual en celular y tablet. No hay navegador en esta sesión, así que se verificó el contenido HTML, no el aspecto.
   - Decisión sobre el acceso desde el login: hoy redirige a `/dashboard`.
 - `npm run type-check`, `npm test` (123 pruebas), `npm run lint` y `npm run build`: todo correcto.
+
+### Acceso al inventario desde el login · 2026-11-07
+
+- Problema reportado: después del login se iba siempre a `/dashboard`, sin enlace al inventario.
+- `destinoTrasLogin(email)` en `src/lib/auth/sesion.ts`: `/inventario` si el correo tiene rol en `acceso`; si no, `/dashboard`. Si la consulta falla, también `/dashboard`, para no bloquear el login.
+- Cambios mínimos en el login (otro módulo, autorizados por el estudiante):
+  - `api/auth/login/route.ts` devuelve también `destino`.
+  - `LoginPage.tsx` navega a ese destino.
+  - `AppShell.tsx` muestra "Inventario" en el menú del panel solo a quien tiene rol.
+- La barra del inventario tiene "Panel", para volver a Usuarios y Cambiar contraseña.
+- Pruebas: 2 nuevas en `sesion.test.ts` (125 en total). En vivo, el login del administrador da `destino: /inventario` y los dos enlaces aparecen.
