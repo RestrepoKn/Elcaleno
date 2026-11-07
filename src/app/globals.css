@@ -8,6 +8,29 @@
   --font-sans: var(--font-geist-sans);
 }
 
+/* Inventario del bar (plan, sección 13). Se agregan sin tocar los tokens de arriba. */
+@theme {
+  --color-primario: #990011;
+  --color-primario-oscuro: #7a000e;
+  --color-primario-suave: #f3e2e2;
+  --color-reponer: #2f3c7e;
+  --color-alerta-amarilla: #e8a500;
+  --color-alerta-amarilla-texto: #6b4d00;
+  --color-alerta-roja: #c62828;
+  --color-alerta-roja-texto: #8e1b1b;
+  --color-ok: #3e7c4a;
+  --color-ok-texto: #2c5a35;
+  --color-sobrante: #3a5a7a;
+  --color-turno-abierto: #2e6e8e;
+  --color-turno-revision: #6b4e9b;
+  --color-turno-cerrado: #5b6770;
+  --color-fondo: #fcf6f5;
+  --color-superficie: #ffffff;
+  --color-texto: #2b2b2b;
+  --color-texto-suave: #5a4d4c;
+  --color-borde: #e9d9d8;
+}
+
 body {
   margin: 0;
   background: var(--background);

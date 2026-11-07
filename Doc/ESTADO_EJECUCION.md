@@ -8,7 +8,7 @@
 | P03 | 3 · Servidor | Completado |
 | P04 | 4 · Datos | Completado (la fase 4 sigue abierta hasta P05) |
 | P05 | 4 · API | Completado (fase 4 cerrada) |
-| P06 | 5 · Interfaz base | Pendiente |
+| P06 | 5 · Interfaz base | Completado |
 | P07 | 5 · Turno | Pendiente |
 | P08 | 5 y 6 · Cierre y aceptación | Pendiente |
 | P09 | 7 · Opcionales | Pendiente |
@@ -128,3 +128,34 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
 - `db:limpiar -- --solo-prueba`: limpia solo los datos "Prueba …" y conserva la demostración.
 - Diagnóstico de producción: `registrarConexionElegida` (en `variables-conexion.mjs`) registra una vez por proceso la variable, el ref del proyecto y el puerto, nunca la cadena. La usan `conexion.ts` y `supabase-db.ts`.
 - Pendiente: el login publicado responde 401 aunque Vercel ya solo tiene `POSTGRES_URL` y `POSTGRES_URL_NON_POOLING`. Con este registro, los logs de Vercel mostrarán qué proyecto usa producción.
+
+### P06 · 2026-11-07
+
+- Producción verificada antes de empezar.
+  - Log de Vercel: `[db] conexión: POSTGRES_URL · proyecto lowkdcsbsnjxagfgkvvj · puerto 6543`, la misma base que en local.
+  - Login con el administrador de demostración: 200. `/api/inventario/sesion`: 200 con rol administrador.
+  - El 401 anterior con la cuenta del estudiante se debía a que la contraseña se cambió desde `/password`.
+- Tokens de la sección 13 en un `@theme` nuevo de `globals.css`. Se agregaron variantes de texto oscuro (`-texto`) para las insignias. No se borró nada; el tema claro se aplica solo dentro de `/inventario`.
+- `src/components/ui/`: `Boton`, `Campo`, `Selector`, `Tarjeta`, `Insignia`, `Aviso` y `Modal` (sobre `<dialog>`), `EstadoVacio`. Todos con foco visible. Los componentes en inglés del otro módulo no se tocaron: tienen estilos oscuros fijos.
+- `src/components/inventario/`:
+  - `NavegacionInventario`: enlaces según el rol, correo, rol y cerrar sesión.
+  - `InsigniaAlerta` (D-3: azul "Por reponer" para el bar; amarilla y roja para helados; siempre con texto) e `InsigniaEstadoTurno`.
+  - `TablaInventario`: tarjetas en móvil y tabla en escritorio.
+  - `FormularioProducto`: alta y edición; umbrales precargados según la sección; la sección no se puede cambiar al editar.
+  - `TablaProductos`: filtro por sección, editar en un modal, activar y desactivar.
+  - `SinPermiso`.
+- `src/lib/inventario/cliente.ts`: `llamarApi` y `ErrorApi` para los componentes de cliente; muestra el mensaje del servidor, por ejemplo `PRODUCTO_DUPLICADO`.
+- Páginas:
+  - `/inventario/layout.tsx`: sin sesión redirige a `/login`; con sesión pero sin rol muestra "Sin acceso al inventario".
+  - `/inventario`: filtros por sección y "solo por reponer" en la URL.
+  - `/inventario/productos` y `/inventario/productos/nuevo`: solo administrador.
+  - Marcadores `/inventario/turno` (P07) e `/inventario/turnos` (P08).
+- Verificación con `next dev`:
+  - Sin sesión, `/inventario` da 307 al login.
+  - El administrador ve el inventario con "Por reponer", "Alerta amarilla", "Alerta roja" y "Conteo físico"; el filtro de helados por reponer muestra fresa y chocolate pero no vainilla (5) ni cerveza (bar); productos y formulario cargan.
+  - Un encargado temporal (creado y borrado) ve el inventario sin los enlaces Productos e Historial, y "No tiene permiso" en `/productos`, `/productos/nuevo` y `/turnos`.
+- La contraseña de `encargado@demo.elcaleno.test` se cambió a las 14:42 UTC desde la cuenta del estudiante; no se modificó.
+- Pendiente:
+  - Revisión visual en celular y tablet. No hay navegador en esta sesión, así que se verificó el contenido HTML, no el aspecto.
+  - Decisión sobre el acceso desde el login: hoy redirige a `/dashboard`.
+- `npm run type-check`, `npm test` (123 pruebas), `npm run lint` y `npm run build`: todo correcto.
