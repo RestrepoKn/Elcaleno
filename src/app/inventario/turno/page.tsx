@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FormularioTurno } from "@/components/inventario/FormularioTurno";
 import { InsigniaEstadoTurno } from "@/components/inventario/InsigniaEstadoTurno";
 import { PlanillaTurno } from "@/components/inventario/PlanillaTurno";
@@ -48,8 +49,11 @@ export default async function PaginaTurno() {
       {enRevision.map((t) => (
         <Aviso key={t.id} tipo="info" titulo={`Turno ${t.nombre} del ${formatearFecha(t.fecha)}: en revisión`}>
           {usuario.rol === "administrador"
-            ? "Está esperando la revisión del administrador (facturas, pago y cierre)."
-            : "El administrador lo está revisando."}
+            ? "Está esperando su revisión: facturas, pago y cierre. "
+            : "El administrador lo está revisando. "}
+          <Link href={`/inventario/turnos/${t.id}`} className="font-semibold underline underline-offset-4">
+            {usuario.rol === "administrador" ? "Revisar y cerrar" : "Ver la planilla"}
+          </Link>
         </Aviso>
       ))}
       <Tarjeta>

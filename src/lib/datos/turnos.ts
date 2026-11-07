@@ -204,6 +204,20 @@ export async function obtenerTurno(turnoId: string, rol: Rol): Promise<TurnoDeta
   return leerTurnoObligatorio(null, turnoId, rol);
 }
 
+/** true si existe un turno creado después de este (entonces ya no se puede devolver, RN-12). */
+export async function tieneTurnoPosterior(turnoId: string): Promise<boolean> {
+  if (!esUuid(turnoId)) return false;
+  const [fila] = await filas<{ hay: boolean }>(
+    null,
+    `select exists (
+       select 1 from turnos o, turnos t
+       where t.id = $1 and o.id <> t.id and o.created_at > t.created_at
+     ) as hay`,
+    [turnoId],
+  );
+  return fila?.hay ?? false;
+}
+
 /** El turno abierto actual, o null si no hay. */
 export async function obtenerTurnoAbierto(rol: Rol): Promise<TurnoDetalle | null> {
   const [abierto] = await filas<{ id: string }>(null, "select id from turnos where estado = 'abierto'");

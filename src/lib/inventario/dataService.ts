@@ -20,6 +20,7 @@ export {
   obtenerTurno,
   obtenerTurnoAbierto,
   registrarFinanzas,
+  tieneTurnoPosterior,
 } from "@/lib/datos/turnos";
 
 export {

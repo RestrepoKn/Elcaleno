@@ -10,7 +10,7 @@
 | P05 | 4 · API | Completado (fase 4 cerrada) |
 | P06 | 5 · Interfaz base | Completado |
 | P07 | 5 · Turno | Completado |
-| P08 | 5 y 6 · Cierre y aceptación | Pendiente |
+| P08 | 5 y 6 · Cierre y aceptación | Completado (aceptación A-01 a A-21 pendiente en Vercel) |
 | P09 | 7 · Opcionales | Pendiente |
 
 ## Bitácora
@@ -195,3 +195,29 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
   - Datos de prueba borrados con `db:limpiar -- --solo-prueba`; no quedó ningún turno abierto.
 - Pendiente: revisión visual en celular y tablet. Sin navegador en esta sesión, se verificó el HTML.
 - `npm run type-check`, `npm test` (125 pruebas), `npm run lint` y `npm run build`: todo correcto.
+
+### P08 · 2026-11-07
+
+- Rutas del plan y del dictamen: `/inventario/turnos` (historial) y `/inventario/turnos/[id]` (detalle y resumen), no `historial/` ni `resumen/`.
+- `src/components/inventario/RevisionTurno.tsx` (administrador):
+  - Facturas en efectivo y pago al encargado (PUT `finanzas`).
+  - Resumen en vivo con `resultadoNeto`, incluido el negativo.
+  - "Cerrar turno" con la confirmación de 12.1, que avisa si faltan finanzas o hay cambios sin guardar.
+  - "Devolver al encargado", deshabilitado si hay un turno posterior.
+  - Turno cerrado: valores guardados en solo lectura.
+- `src/components/inventario/PlanillaLectura.tsx`: planilla en solo lectura, con tarjetas en móvil y tabla en escritorio.
+- `src/components/inventario/TablaHistorial.tsx`.
+- Páginas `turnos/page.tsx`, con historial y totales de los turnos cerrados, y `turnos/[id]/page.tsx`, donde el encargado ve la planilla sin finanzas.
+- `tieneTurnoPosterior(turnoId)` agregado a `lib/datos/turnos.ts` y a la fachada.
+- "Turno actual" enlaza cada turno en revisión: "Revisar y cerrar" para el administrador, "Ver la planilla" para el encargado.
+- Revisión de código: sin hallazgos. Detalle en `Doc/checkpoints/FASE_6_COMPLETADA.md`.
+- Verificación en vivo, solo lectura, porque el estudiante tenía abierto el turno "Mañana" para su revisión y no se tocó:
+  - Historial: $178.000 de venta, $11.500 de faltantes y $108.000 de neto.
+  - Detalle cerrado (administrador): resumen guardado, planilla con faltante, sobrante y cuadra, sin campos ni botones.
+  - Detalle cerrado (encargado temporal): sin finanzas.
+  - Detalle del turno abierto (administrador): aviso "sigue abierto", sin botón de cerrar.
+  - Turno inexistente: página de no encontrado.
+- `probar:flujo` no se repitió (ver FASE_6).
+- `Doc/ACEPTACION.md`, la sección del README, `FASE_5_COMPLETADA.md` y `FASE_6_COMPLETADA.md` creados.
+- `.gitignore` y credenciales revisados.
+- `npm run type-check`, `npm test` (125), `npm run lint` y `npm run build`: todo correcto.
