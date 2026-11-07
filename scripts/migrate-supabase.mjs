@@ -1,13 +1,14 @@
 import nextEnv from "@next/env";
 import { readdir, readFile } from "node:fs/promises";
 import { Pool } from "pg";
+import { MENSAJE_FALTA_CONEXION, urlConexionPostgres } from "../src/lib/db/variables-conexion.mjs";
 
 const { loadEnvConfig } = nextEnv;
 loadEnvConfig(process.cwd());
 
-const connectionString = process.env.ELCALENOSM_POSTGRES_URL ?? process.env.ELCALENOSM_POSTGRES_PRISMA_URL;
+const connectionString = urlConexionPostgres({ preferirSesion: true })?.valor;
 if (!connectionString) {
-  throw new Error("Configura ELCALENOSM_POSTGRES_URL en .env.local.");
+  throw new Error(MENSAJE_FALTA_CONEXION);
 }
 
 const databaseUrl = new URL(connectionString);

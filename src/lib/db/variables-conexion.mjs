@@ -1,0 +1,42 @@
+// Elige la cadena de conexión a Postgres según las variables disponibles.
+// La usan la app (login e inventario) y los scripts de scripts/.
+//
+// Acepta tres nombres para cada variable, en este orden:
+//   ELCALENO_    prefijo actual de la integración de Supabase en Vercel
+//   ELCALENOSM_  prefijo anterior
+//   (sin prefijo) como queda al copiar el bloque de Supabase a .env.local
+//
+// preferirSesion = true usa primero el session pooler (puerto 5432, *_URL_NON_POOLING):
+// conviene para scripts y para `next dev`. En producción (Vercel, serverless) se usa primero
+// el transaction pooler (puerto 6543, *_URL).
+
+const PREFIJOS = ["ELCALENO_", "ELCALENOSM_", ""];
+const AGRUPADA = ["POSTGRES_URL", "POSTGRES_PRISMA_URL"];
+const SESION = ["POSTGRES_URL_NON_POOLING"];
+
+/**
+ * @param {string[]} nombres
+ * @returns {{ nombre: string, valor: string } | null}
+ */
+function primeraDefinida(nombres) {
+  for (const nombreBase of nombres) {
+    for (const prefijo of PREFIJOS) {
+      const nombre = prefijo + nombreBase;
+      const valor = process.env[nombre];
+      if (valor) return { nombre, valor };
+    }
+  }
+  return null;
+}
+
+/**
+ * @param {{ preferirSesion?: boolean }} [opciones]
+ * @returns {{ nombre: string, valor: string } | null}
+ */
+export function urlConexionPostgres(opciones = {}) {
+  const orden = opciones.preferirSesion ? [...SESION, ...AGRUPADA] : [...AGRUPADA, ...SESION];
+  return primeraDefinida(orden);
+}
+
+export const MENSAJE_FALTA_CONEXION =
+  "Falta la conexión a Postgres: configura ELCALENO_POSTGRES_URL (o ELCALENOSM_POSTGRES_URL, o POSTGRES_URL) en .env.local.";

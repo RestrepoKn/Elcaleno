@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "db:migrate": "node scripts/migrate-supabase.mjs",
+    "db:verificar": "node scripts/verificar-bd.mjs",
+    "db:usuario": "node scripts/crear-usuario.mjs",
     "lint": "eslint",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "type-check": "tsc --noEmit",
