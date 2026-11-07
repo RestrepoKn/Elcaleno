@@ -9,7 +9,7 @@
 | P04 | 4 · Datos | Completado (la fase 4 sigue abierta hasta P05) |
 | P05 | 4 · API | Completado (fase 4 cerrada) |
 | P06 | 5 · Interfaz base | Completado |
-| P07 | 5 · Turno | Pendiente |
+| P07 | 5 · Turno | Completado |
 | P08 | 5 y 6 · Cierre y aceptación | Pendiente |
 | P09 | 7 · Opcionales | Pendiente |
 
@@ -170,3 +170,28 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
   - `AppShell.tsx` muestra "Inventario" en el menú del panel solo a quien tiene rol.
 - La barra del inventario tiene "Panel", para volver a Usuarios y Cambiar contraseña.
 - Pruebas: 2 nuevas en `sesion.test.ts` (125 en total). En vivo, el login del administrador da `destino: /inventario` y los dos enlaces aparecen.
+
+### P07 · 2026-11-07
+
+- `src/components/inventario/FormularioTurno.tsx`: fecha (hoy en Bogotá por defecto), nombre libre con sugerencias Mañana, Tarde y Noche (D-4), y encargado. Muestra `TURNO_YA_ABIERTO` y `TURNO_DUPLICADO` con su mensaje.
+- `src/components/inventario/FilaRegistro.tsx`:
+  - Inicial (solo lectura para el encargado, RN-09), entrada, vendida, inventario final y total de venta en vivo (con `inventarioFinalCalculado` y `totalVenta`), contado y resultado del conteo (cuadra, faltante o sobrante).
+  - Usa los textos fijos de 12.1 para faltante y sobrante.
+  - Guarda al salir de cada campo o con Enter, con una cola por fila. `VENDIDO_EXCEDE_EXISTENCIA` se muestra junto a la fila, antes de enviar y también si lo responde el servidor.
+  - Muestra "Guardando…", "Guardado" o el error.
+  - Framer Motion: el fondo de la fila cambia con faltante o sobrante, y el mensaje aparece con transición. `MotionConfig reducedMotion="user"` respeta la preferencia de menos movimiento.
+- `src/components/inventario/PlanillaTurno.tsx`:
+  - Secciones Bar y Helados.
+  - Resumen fijo abajo: venta total, a cancelar por faltantes y filas sin conteo.
+  - "Entregar turno" con la confirmación de 12.1, que avisa cuántas filas faltan. El servidor responde `TURNO_INCOMPLETO` con el número.
+- `src/app/inventario/turno/page.tsx`: con turno abierto muestra la planilla; sin turno, avisa de los turnos en revisión y muestra el formulario.
+- Corrección del lint (`react-hooks/refs`): los valores guardados de la fila se leen desde estado durante el render.
+- Verificación con `next dev`, con un encargado temporal (creado y borrado):
+  - Formulario sin turno.
+  - El encargado abre "Prueba P07" con 8 filas; la gaseosa trae inicial 16, el conteo del turno demo.
+  - Planilla completa para el encargado, con el inicial de solo lectura; el administrador ve el aviso de que puede ajustarlo.
+  - 16 + 4 − 3 = 17; conteo 15 → faltante 2, valor a cancelar 7000.
+  - Entregar con 7 filas sin conteo da `TURNO_INCOMPLETO`.
+  - Datos de prueba borrados con `db:limpiar -- --solo-prueba`; no quedó ningún turno abierto.
+- Pendiente: revisión visual en celular y tablet. Sin navegador en esta sesión, se verificó el HTML.
+- `npm run type-check`, `npm test` (125 pruebas), `npm run lint` y `npm run build`: todo correcto.
