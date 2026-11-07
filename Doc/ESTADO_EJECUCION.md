@@ -6,7 +6,7 @@
 | P01 | 1 · Base de datos | Completado (base nueva) |
 | P02 | 2 · Reglas | Completado (adelantado; no depende de la base) |
 | P03 | 3 · Servidor | Completado |
-| P04 | 4 · Datos | Pendiente |
+| P04 | 4 · Datos | Completado (la fase 4 sigue abierta hasta P05) |
 | P05 | 4 · API | Pendiente |
 | P06 | 5 · Interfaz base | Pendiente |
 | P07 | 5 · Turno | Pendiente |
@@ -74,3 +74,48 @@
   - `/inventario` sin sesión: 307 al login.
 - Sin verificar en vivo: un correo con sesión pero sin rol en `acceso`. Está cubierto por pruebas unitarias.
 - `npm run type-check`, `npm test` (15 archivos, 123 pruebas), `npm run lint` y `npm run build`: todo correcto.
+
+### P04 · 2026-11-07
+
+- Capa de datos en `src/lib/datos/`:
+  - `comun.ts`: `filas`, `conErrores`, validación de ids.
+  - `lecturas.ts`: lecturas de `v_registros_turno` y `v_turnos`; oculta las finanzas al encargado.
+  - `productos.ts`: crear (con RN-13), actualizar, desactivar, `inicialSugerido`.
+  - `turnos.ts`: abrir (7.1), entregar (7.2), finanzas, cerrar (7.3), devolver (`entregado_at = NULL`), lecturas e historial.
+  - `registros.ts`: `actualizarRegistro` en una transacción, más `registrarMovimiento`, `registrarConteo` y `ajustarInicial`.
+  - `inventario.ts`: `inventarioActual` con `nivelAlerta` y el filtro "por reponer".
+  - `cocina.ts` y `facturas.ts`: vacíos, preparados para P09.
+- `tipos.ts` completo (10.6). Se agregaron `ventaTotalCierre`, `resultadoNetoCierre`, `numRegistros`, `entregadoAt`, `cerradoAt` y `createdAt`.
+- Fachada: `src/lib/inventario/dataService.ts`. No incluye la sesión, para que los scripts con `tsx` puedan usarla.
+- Traducción de errores de Postgres (9.4) movida a `src/lib/reglas/errores-bd.ts`, que es pura. La usan la capa de datos y `lib/http/respuestas.ts`.
+- Diferencias con el prompt:
+  - `registrarFinanzas` (nombre del plan) en vez de `registrarCierreFinanciero`.
+  - Las funciones que devuelven un turno reciben el `rol`, para ocultar las finanzas al encargado.
+  - `obtenerTurnoAbierto(rol)`, para la pantalla de P07.
+- Solo `lib/datos/` importa `lib/db/conexion.ts`, más una prueba unitaria y `cerrarConexion` en los scripts.
+- Scripts:
+  - `db:limpiar` (`scripts/limpiar-prueba.mjs`): borra turnos y productos "Prueba …" y "Demo …", y los usuarios `@demo.elcaleno.test`.
+  - `db:demo` (`scripts/cargar-demo.ts`).
+  - `probar:flujo` (`scripts/probar-flujo.ts`).
+- `tsx` sigue como dependencia indirecta (viene con `vercel`). `npm install -D tsx` no pudo completarse porque el registro de npm no responde desde esta red. Pendiente agregarlo cuando haya red.
+- Orden usado: `db:limpiar`, `probar:flujo`, `db:demo`.
+
+`npm run probar:flujo`: 33 de 33 pasos OK, fallas 0. Son los pasos 1 a 21 de 16.2 más 13a, 14a, 14b, 17a, 19a y 22 a 28: devolver sin y con turno posterior, vista del encargado, resultado neto negativo (−7000), RN-08, RN-13 y `TURNO_DUPLICADO`.
+
+`npm run db:demo`:
+```text
+Productos creados: 8.
+Turno "Demo Mañana" del 2026-11-07: venta total $ 178.000, faltantes $ 11.500, resultado neto $ 108.000.
+  bar      Demo Agua                    6  Sin alerta
+  bar      Demo Cerveza                 4  Por reponer
+  bar      Demo Chocolatina             4  Por reponer
+  bar      Demo Gaseosa 400 ml         16  Sin alerta
+  bar      Demo Papitas                 5  Por reponer
+  helados  Demo Helado de chocolate     1  Alerta roja
+  helados  Demo Helado de fresa         3  Alerta amarilla
+  helados  Demo Helado de vainilla      5  Sin alerta
+Usuarios: admin@demo.elcaleno.test (administrador) y encargado@demo.elcaleno.test (encargado).
+Las contraseñas se generan en cada ejecución y no se guardan aquí.
+```
+
+`npm run type-check`, `npm test` (123 pruebas), `npm run lint` y `npm run build`: todo correcto.
