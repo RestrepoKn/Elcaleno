@@ -16,6 +16,8 @@ export type CodigoError =
   | "TRANSICION_INVALIDA"
   | "VENDIDO_EXCEDE_EXISTENCIA"
   | "FACTURA_DUPLICADA"
+  | "FOTO_INVALIDA"
+  | "FOTO_NO_ENCONTRADA"
   | "ERROR_INTERNO";
 
 export const MENSAJES: Record<CodigoError, string> = {
@@ -34,6 +36,8 @@ export const MENSAJES: Record<CodigoError, string> = {
   TRANSICION_INVALIDA: "Esa acción no es válida para el estado actual del turno.",
   VENDIDO_EXCEDE_EXISTENCIA: "La cantidad vendida supera lo disponible (inicial más entrada).",
   FACTURA_DUPLICADA: "Ya existe una factura con ese número para ese producto.",
+  FOTO_INVALIDA: "La foto debe ser JPG, PNG o WEBP y pesar máximo 4 MB.",
+  FOTO_NO_ENCONTRADA: "La foto no existe.",
   ERROR_INTERNO: "Ocurrió un error inesperado. Intente de nuevo.",
 };
 
@@ -53,6 +57,8 @@ export const ESTADO_HTTP: Record<CodigoError, number> = {
   TRANSICION_INVALIDA: 409,
   VENDIDO_EXCEDE_EXISTENCIA: 409,
   FACTURA_DUPLICADA: 409,
+  FOTO_INVALIDA: 400,
+  FOTO_NO_ENCONTRADA: 404,
   ERROR_INTERNO: 500,
 };
 

@@ -25,5 +25,10 @@ export const LONGITUD_ENCARGADO = 80;
 export const LONGITUD_NUMERO_FACTURA = 40; // opcional F6
 export const LONGITUD_PROVEEDOR = 120; // opcional F6
 
+// Fotos de facturas del turno (M4). Vercel no acepta cuerpos de más de 4,5 MB: el navegador las reduce antes.
+export const FOTO_TAMANO_MAXIMO = 4 * 1024 * 1024;
+export const FOTO_TIPOS = ["image/jpeg", "image/png", "image/webp"] as const;
+export const FOTOS_MAXIMAS_POR_TURNO = 60;
+
 export const ZONA_HORARIA = "America/Bogota";
 export const LIMITE_LISTADO = 200;

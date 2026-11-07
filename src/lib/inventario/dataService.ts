@@ -32,10 +32,22 @@ export {
 
 export { inventarioActual } from "@/lib/datos/inventario";
 
+// Opcionales (P09)
+export { listarCocina, productosDeCocina, registrarTurnoCocina } from "@/lib/datos/cocina";
+export { listarFacturas, registrarFactura } from "@/lib/datos/facturas";
+
+// Fotos de facturas del turno (M4)
+export { borrarFoto, listarFotos, obtenerArchivoFoto, subirFoto } from "@/lib/datos/fotos";
+
 export type {
   CambiosProducto,
   CambiosRegistro,
+  DatosCocina,
+  DatosFactura,
   DatosProducto,
+  FacturaConAumento,
+  FotoTurno,
+  RegistroCocina,
   DatosTurno,
   FilaInventario,
   Finanzas,

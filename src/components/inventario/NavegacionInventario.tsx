@@ -11,6 +11,8 @@ const ENLACES: Enlace[] = [
   { href: "/inventario/turno", texto: "Turno actual" },
   { href: "/inventario/productos", texto: "Productos", soloAdministrador: true },
   { href: "/inventario/turnos", texto: "Historial", soloAdministrador: true },
+  { href: "/inventario/cocina", texto: "Cocina" },
+  { href: "/inventario/facturas", texto: "Facturas", soloAdministrador: true },
 ];
 
 function estaActivo(ruta: string, href: string): boolean {

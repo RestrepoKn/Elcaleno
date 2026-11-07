@@ -6,7 +6,8 @@ import { RevisionTurno } from "@/components/inventario/RevisionTurno";
 import { Aviso } from "@/components/ui/Aviso";
 import { obtenerUsuario } from "@/lib/auth/sesion";
 import { formatearFecha, formatearFechaHora, formatearPesos } from "@/lib/formato";
-import { obtenerTurno, tieneTurnoPosterior, type TurnoDetalle } from "@/lib/inventario/dataService";
+import { FotosTurno } from "@/components/inventario/FotosTurno";
+import { listarFotos, obtenerTurno, tieneTurnoPosterior, type TurnoDetalle } from "@/lib/inventario/dataService";
 import { ErrorDeNegocio } from "@/lib/reglas/errores";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +75,14 @@ export default async function PaginaDetalleTurno({ params }: { params: Promise<{
           <Link href="/inventario/turno" className="font-semibold underline">Turno actual</Link>.
         </Aviso>
       ) : null}
+
+      <FotosTurno
+        turnoId={turno.id}
+        estado={turno.estado}
+        rol={usuario.rol}
+        email={usuario.email}
+        fotosIniciales={await listarFotos(turno.id)}
+      />
 
       <PlanillaLectura registros={turno.registros} />
     </>

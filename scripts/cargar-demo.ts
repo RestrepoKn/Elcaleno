@@ -2,7 +2,7 @@
 // Uso: npm run db:demo
 //
 // - Limpia antes los datos "Prueba …" y "Demo …".
-// - Crea productos "Demo …" de bar y de helados, y un turno "Demo Mañana" ya cerrado,
+// - Crea productos "Demo …" de bar y de helados, y un turno "Demo Completo" ya cerrado,
 //   con movimientos, conteo (un faltante, un sobrante) y finanzas. Así el inventario actual muestra
 //   todas las alertas: sin alerta, por reponer (bar), amarilla y roja (helados).
 // - Crea dos usuarios de demostración (administrador y encargado) con contraseñas nuevas, que se imprimen.
@@ -73,7 +73,7 @@ async function principal(): Promise<void> {
     }
     console.log(`Productos creados: ${PRODUCTOS.length}.`);
 
-    const turno = await abrirTurno({ nombre: "Demo Mañana", encargado: "Encargado demo" }, "administrador");
+    const turno = await abrirTurno({ nombre: "Demo Completo", encargado: "Encargado demo" }, "administrador");
     for (const fila of turno.registros) {
       const p = porId.get(fila.productoId);
       if (!p) continue; // producto real activo: queda con su inicial sugerido y sin movimientos

@@ -11,7 +11,7 @@
 | P06 | 5 · Interfaz base | Completado |
 | P07 | 5 · Turno | Completado |
 | P08 | 5 y 6 · Cierre y aceptación | Completado (aceptación A-01 a A-21 pendiente en Vercel) |
-| P09 | 7 · Opcionales | Pendiente |
+| P09 | 7 · Opcionales | Completado |
 
 ## Bitácora
 
@@ -221,3 +221,53 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
 - `Doc/ACEPTACION.md`, la sección del README, `FASE_5_COMPLETADA.md` y `FASE_6_COMPLETADA.md` creados.
 - `.gitignore` y credenciales revisados.
 - `npm run type-check`, `npm test` (125), `npm run lint` y `npm run build`: todo correcto.
+
+### P09 · 2026-11-07
+
+- Adelantado a pedido del estudiante, antes de diligenciar la aceptación.
+- M3 aplicada y verificada; reglas, datos, API y pantallas de cocina (F5) y facturas de compra (F6). Detalle en `Doc/checkpoints/FASE_7_COMPLETADA.md`.
+- Numeración del plan: T-62 a T-65 para `hayAumento(valorAnterior, valorNuevo)` y T-66 a T-68 para `inventarioFinalCocina`. El prompt las tenía invertidas, igual que el orden de los parámetros.
+- `db:limpiar` ahora borra también las facturas y los registros de cocina de prueba.
+- Verificación en vivo: 13 de 13. No se tocó el turno abierto "Mañana" del estudiante.
+- `npm test` (134), `type-check`, `lint` y `build`: todo correcto.
+
+### Extensión · Fotos de facturas del turno · 2026-11-07
+
+- Solicitud del estudiante, fuera del plan. Los recibos pagados con la caja son las mismas facturas de compra; se pidió fotografiarlos, guardar las fotos en el turno y revisarlas después.
+- Definido con el estudiante: solo se guarda la foto, sin lectura automática; suben fotos el encargado y el administrador.
+- M4 `20261107120000_inventario_fotos_turno.sql`: tabla `fotos_turno` con RLS y permisos revocados, y espacio privado `facturas-turno` en Supabase Storage (4 MB; JPG, PNG o WEBP). Aplicada; el acceso público se rechaza.
+- `src/lib/db/almacenamiento.mjs`: Storage por su API REST, sin dependencias nuevas. La llave de servicio solo se usa en el servidor; `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY` ya existen en Vercel.
+- Reglas en `src/lib/reglas/fotos.ts`:
+
+| Estado del turno | Subir | Borrar | Ver |
+|---|---|---|---|
+| Abierto | Ambos roles | El administrador, cualquiera; el encargado, solo las suyas | Siempre, con sesión |
+| En revisión | Solo el administrador | Solo el administrador | Siempre, con sesión |
+| Cerrado | Nadie (RN-14) | Nadie | Siempre, con sesión |
+
+- Datos (`src/lib/datos/fotos.ts`): si el registro falla después de subir el archivo, el archivo se borra.
+- Códigos nuevos: `FOTO_INVALIDA` (400) y `FOTO_NO_ENCONTRADA` (404).
+- API: `GET/POST /api/inventario/turnos/[id]/fotos` y `GET/DELETE /api/inventario/turnos/[id]/fotos/[fotoId]`. La imagen se entrega por la API con sesión y caché privada; la ruta de Storage nunca sale del servidor.
+- `FotosTurno`:
+  - "Tomar foto" abre la cámara trasera en el celular; también está "Elegir de la galería".
+  - El navegador reduce la imagen a JPEG de 1.600 px como máximo, por el límite de 4,5 MB de Vercel.
+  - Miniaturas, vista ampliada y borrado según permisos.
+  - Está en "Turno actual" y en el detalle del turno.
+- `db:limpiar` borra también los archivos de Storage de los turnos de prueba.
+- Pruebas: 4 nuevas de reglas (`fotos.test.ts`), 138 en total.
+- Verificación en vivo con `next dev`, sobre un turno temporal en revisión, sin tocar el turno "Mañana" del estudiante: 12 de 12 OK.
+  - El administrador sube (201); el encargado en revisión recibe 403; un PDF da 400; un turno cerrado da 409.
+  - Se lista; la imagen descargada es idéntica a la subida y tiene caché privada; sin sesión da 401.
+  - El encargado la ve; el detalle muestra la miniatura.
+  - El encargado no borra (403); el administrador sí (200); la foto borrada da 404.
+  - Limpieza: 0 filas y 0 archivos.
+- La primera versión de la prueba (PowerShell con `curl.exe`) no sirvió porque el JSON del login perdió las comillas. Se rehízo en TypeScript con `fetch`.
+- Pendiente: la cámara y la reducción de la imagen en un celular real. No hay navegador en esta sesión.
+- `npm run type-check`, `npm test` (138), `npm run lint` y `npm run build`: todo correcto.
+
+### Turno de día completo · 2026-11-07
+
+- Pedido del estudiante: el turno cubre el día completo, así que no se ofrecen "Mañana, Tarde, Noche".
+- `FormularioTurno`: se quitaron las sugerencias. El nombre viene escrito como "Completo" y se puede cambiar solo si se abre otro turno en la misma fecha (fecha más nombre es único). Sigue siendo texto libre (D-4).
+- Base de datos: el turno abierto "Mañana" del estudiante se renombró a "Completo", con sus 8 filas intactas; el turno de demostración "Demo Mañana" (cerrado), a "Demo Completo". Este último es una excepción a RN-14, justificada porque es un dato de demostración y solo cambió el nombre.
+- `scripts/cargar-demo.ts` y A-05 de `Doc/ACEPTACION.md` usan el nombre nuevo.

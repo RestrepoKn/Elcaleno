@@ -10,6 +10,7 @@
 import nextEnv from "@next/env";
 import { pathToFileURL } from "node:url";
 import pg from "pg";
+import { borrarObjetos } from "../src/lib/db/almacenamiento.mjs";
 import { MENSAJE_FALTA_CONEXION, urlConexionPostgres } from "../src/lib/db/variables-conexion.mjs";
 
 export const DOMINIO_DEMO = "@demo.elcaleno.test";
@@ -25,7 +26,35 @@ export async function limpiarDatosDePrueba(cliente, opciones = {}) {
 
   await cliente.query("BEGIN");
   try {
+    // Opcionales (M3), si ya existen: facturas de prueba (número "Prueba…" o de un producto de prueba) y cocina.
+    const [m3] = (await cliente.query("select to_regclass('public.facturas') is not null as hay")).rows;
+    let facturas = 0;
+    let cocina = 0;
+    if (m3?.hay) {
+      const f = await cliente.query(
+        `delete from facturas f using productos p
+         where p.id = f.producto_id and (f.numero ~* $1 or p.nombre ~* $2)
+         returning f.id`,
+        [incluirDemo ? "^(prueba|demo)" : "^prueba", patronProducto],
+      );
+      facturas = f.rowCount ?? 0;
+      const c = await cliente.query("delete from registros_cocina where producto ~* $1 returning id", [patronProducto]);
+      cocina = c.rowCount ?? 0;
+    }
+    // Fotos de los turnos que se van a borrar (M4): los archivos de Storage no se borran en cascada.
+    const [m4] = (await cliente.query("select to_regclass('public.fotos_turno') is not null as hay")).rows;
+    const rutasFotos = m4?.hay
+      ? (
+          await cliente.query(
+            "select f.ruta from fotos_turno f join turnos t on t.id = f.turno_id where t.nombre ~* $1",
+            [patronTurno],
+          )
+        ).rows.map((r) => r.ruta)
+      : [];
     const turnos = await cliente.query("delete from turnos where nombre ~* $1 returning id", [patronTurno]);
+    if (rutasFotos.length > 0) {
+      await borrarObjetos(rutasFotos).catch((e) => console.error(`No se pudieron borrar ${rutasFotos.length} fotos de Storage: ${e.message}`));
+    }
     const borrados = await cliente.query(
       `delete from productos p
        where p.nombre ~* $1
@@ -49,6 +78,8 @@ export async function limpiarDatosDePrueba(cliente, opciones = {}) {
       productosBorrados: borrados.rowCount ?? 0,
       productosDesactivados: desactivados.rowCount ?? 0,
       usuarios,
+      facturas,
+      cocina,
     };
   } catch (error) {
     await cliente.query("ROLLBACK").catch(() => {});
@@ -80,7 +111,7 @@ async function principal() {
     const r = await limpiarDatosDePrueba(cliente, { incluirDemo: !process.argv.includes("--solo-prueba") });
     console.log(
       `Limpieza: ${r.turnos} turnos, ${r.productosBorrados} productos borrados, ` +
-        `${r.productosDesactivados} desactivados, ${r.usuarios} usuarios demo.`,
+        `${r.productosDesactivados} desactivados, ${r.usuarios} usuarios demo, ${r.facturas} facturas, ${r.cocina} registros de cocina.`,
     );
   } finally {
     cliente.release();

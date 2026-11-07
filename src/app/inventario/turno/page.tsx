@@ -6,7 +6,8 @@ import { Aviso } from "@/components/ui/Aviso";
 import { Tarjeta } from "@/components/ui/Tarjeta";
 import { obtenerUsuario } from "@/lib/auth/sesion";
 import { formatearFecha } from "@/lib/formato";
-import { listarTurnos, obtenerTurnoAbierto } from "@/lib/inventario/dataService";
+import { FotosTurno } from "@/components/inventario/FotosTurno";
+import { listarFotos, listarTurnos, obtenerTurnoAbierto } from "@/lib/inventario/dataService";
 import { hoyBogota } from "@/lib/reglas/fechas";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,13 @@ export default async function PaginaTurno() {
           Escriba la entrada, la cantidad vendida y el conteo físico de cada producto. Cada dato se guarda al salir
           del campo; el inventario final y el total se calculan solos.
         </p>
+        <FotosTurno
+          turnoId={turno.id}
+          estado={turno.estado}
+          rol={usuario.rol}
+          email={usuario.email}
+          fotosIniciales={await listarFotos(turno.id)}
+        />
         <PlanillaTurno turno={turno} rol={usuario.rol} />
       </>
     );

@@ -7,13 +7,14 @@ import { Boton } from "@/components/ui/Boton";
 import { Campo } from "@/components/ui/Campo";
 import { llamarApi, mensajeDeError } from "@/lib/inventario/cliente";
 
-const SUGERENCIAS = ["Mañana", "Tarde", "Noche"];
+// El turno cubre el día completo: el nombre viene listo y solo se cambia si hay otro turno en la misma fecha.
+const NOMBRE_POR_DEFECTO = "Completo";
 
 /** CU-03: abre el turno con fecha (hoy por defecto), nombre libre (D-4) y encargado. */
 export function FormularioTurno({ fechaHoy, encargadoSugerido }: { fechaHoy: string; encargadoSugerido?: string }) {
   const router = useRouter();
   const [fecha, setFecha] = useState(fechaHoy);
-  const [nombre, setNombre] = useState("");
+  const [nombre, setNombre] = useState(NOMBRE_POR_DEFECTO);
   const [encargado, setEncargado] = useState(encargadoSugerido ?? "");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,7 @@ export function FormularioTurno({ fechaHoy, encargadoSugerido }: { fechaHoy: str
     setError(null);
     const e: Record<string, string> = {};
     if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) e.fecha = "Elija la fecha del turno.";
-    if (nombre.trim() === "") e.nombre = "Escriba el nombre del turno (por ejemplo, Noche).";
+    if (nombre.trim() === "") e.nombre = `Escriba el nombre del turno (por ejemplo, ${NOMBRE_POR_DEFECTO}).`;
     if (encargado.trim() === "") e.encargado = "Escriba el nombre del encargado.";
     setErrores(e);
     if (Object.keys(e).length > 0) return;
@@ -55,36 +56,16 @@ export function FormularioTurno({ fechaHoy, encargadoSugerido }: { fechaHoy: str
           error={errores.fecha}
           required
         />
-        <div className="flex flex-col gap-2">
-          <Campo
-            etiqueta="Nombre del turno"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            maxLength={40}
-            list="sugerencias-turno"
-            autoComplete="off"
-            error={errores.nombre}
-            required
-          />
-          <datalist id="sugerencias-turno">
-            {SUGERENCIAS.map((s) => (
-              <option key={s} value={s} />
-            ))}
-          </datalist>
-          <div className="flex flex-wrap gap-1.5" aria-label="Sugerencias de nombre">
-            {SUGERENCIAS.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => setNombre(s)}
-                className="min-h-8 rounded-full border border-borde bg-superficie px-3 text-xs font-medium text-texto hover:bg-primario-suave
-                  focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primario"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Campo
+          etiqueta="Nombre del turno"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          maxLength={40}
+          autoComplete="off"
+          error={errores.nombre}
+          ayuda="El turno cubre el día completo. Cámbielo solo si abre otro turno en la misma fecha."
+          required
+        />
         <Campo
           etiqueta="Encargado"
           value={encargado}

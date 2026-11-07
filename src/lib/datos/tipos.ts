@@ -113,6 +113,57 @@ export type FilaInventario = {
   nivelAlerta: NivelAlerta;
 };
 
+// Opcionales (P09)
+
+/** F5 · Turno de cocina: el producto va en texto (la cocina no usa el catálogo del bar). */
+export type DatosCocina = { producto: string; fecha: string; existenciaInicial: number; salida: number };
+
+export type RegistroCocina = {
+  id: number;
+  fecha: string;
+  producto: string;
+  existenciaInicial: number;
+  salida: number;
+  finalEsperado: number;
+  createdAt: string;
+};
+
+/** F6 · Factura de compra: costo de compra, no el valor de venta del producto. */
+export type DatosFactura = {
+  numero: string;
+  proveedor: string;
+  fecha: string;
+  productoId: string;
+  valorUnitario: number;
+  turnoId?: string | undefined;
+};
+
+export type FacturaConAumento = {
+  id: number;
+  numero: string;
+  proveedor: string;
+  fecha: string;
+  productoId: string;
+  producto: string;
+  seccion: Seccion;
+  valorUnitario: number;
+  turnoId: string | null;
+  createdAt: string;
+  /** Comparación con la factura anterior del mismo producto; null si no subió o es la primera. */
+  aumento: { anterior: number; nuevo: number; diferencia: number } | null;
+};
+
+/** Foto de una factura pagada con la caja durante el turno (M4). El archivo está en Supabase Storage. */
+export type FotoTurno = {
+  id: number;
+  turnoId: string;
+  nombreOriginal: string | null;
+  tipo: string;
+  tamano: number;
+  subidaPor: string;
+  createdAt: string;
+};
+
 export type FiltrosInventario = {
   seccion?: Seccion | undefined;
   soloPorReponer?: boolean | undefined;

@@ -24,7 +24,7 @@ type Respuesta<T> =
 /** Llama a /api/inventario{ruta}; devuelve datos o lanza ErrorApi con el mensaje para el usuario. */
 export async function llamarApi<T>(
   ruta: string,
-  opciones: { metodo?: "GET" | "POST" | "PATCH" | "PUT"; cuerpo?: unknown } = {},
+  opciones: { metodo?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE"; cuerpo?: unknown } = {},
 ): Promise<T> {
   let respuesta: Response;
   try {
@@ -48,6 +48,32 @@ export async function llamarApi<T>(
   if (cuerpo?.ok) return cuerpo.datos;
   if (cuerpo && !cuerpo.ok) {
     throw new ErrorApi(cuerpo.error.codigo, cuerpo.error.mensaje, cuerpo.error.detalles, respuesta.status);
+  }
+  throw new ErrorApi("ERROR_INTERNO", "Ocurrió un error inesperado. Intente de nuevo.", null, respuesta.status);
+}
+
+/** Envía un archivo (multipart) a /api/inventario{ruta}; mismo manejo de respuesta que llamarApi. */
+export async function enviarArchivo<T>(ruta: string, campo: string, archivo: Blob, nombre: string): Promise<T> {
+  const formulario = new FormData();
+  formulario.append(campo, archivo, nombre);
+  let respuesta: Response;
+  try {
+    respuesta = await fetch(`/api/inventario${ruta}`, { method: "POST", body: formulario, cache: "no-store" });
+  } catch {
+    throw new ErrorApi("ERROR_INTERNO", "No hay conexión. Revise la red e intente de nuevo.", null, 0);
+  }
+  let cuerpo: Respuesta<T> | null = null;
+  try {
+    cuerpo = (await respuesta.json()) as Respuesta<T>;
+  } catch {
+    cuerpo = null;
+  }
+  if (cuerpo?.ok) return cuerpo.datos;
+  if (cuerpo && !cuerpo.ok) {
+    throw new ErrorApi(cuerpo.error.codigo, cuerpo.error.mensaje, cuerpo.error.detalles, respuesta.status);
+  }
+  if (respuesta.status === 413) {
+    throw new ErrorApi("FOTO_INVALIDA", "La foto es demasiado grande.", null, 413);
   }
   throw new ErrorApi("ERROR_INTERNO", "Ocurrió un error inesperado. Intente de nuevo.", null, respuesta.status);
 }

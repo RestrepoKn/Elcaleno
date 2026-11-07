@@ -49,6 +49,8 @@ Control de inventario por turnos para el bar y los helados de un restaurante. Re
 - **Flujo del turno**: abierto → en revisión → cerrado. El administrador puede devolver un turno en revisión si no hay uno posterior.
 - **Resumen financiero** (administrador): venta total, facturas en efectivo, pago al encargado y resultado neto.
 - **Historial** (administrador) e **inventario actual con alertas** (ambos roles).
+- **Opcionales:** turno de **cocina** (existencia inicial − salida = final esperado; ambos roles) y **facturas de compra** con aviso de aumento de precio (administrador).
+- **Fotos de facturas del turno:** el encargado o el administrador fotografían los recibos pagados con la caja; quedan guardadas, de forma privada, en el turno para revisarlas después (Supabase Storage).
 
 ### Roles
 

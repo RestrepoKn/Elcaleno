@@ -21,7 +21,7 @@ Diligenciar las tres últimas columnas durante la prueba. Evidencia: captura de 
 | A-02 | Como administrador, registrar "Gaseosa" (bar, Bebida, $3.500) y "Helado de vainilla" (helados, $4.000) | Cada uno aparece en su sección; los helados con umbrales 5 y 3 | | | |
 | A-03 | Registrar otra vez "Gaseosa" en el bar | Rechazo por duplicado | | | |
 | A-04 | Con sesión de encargado, intentar cambiar el valor de la Gaseosa | Rechazo: sin permiso | | | |
-| A-05 | Abrir el turno "Noche" con un encargado | Una fila por producto activo; inicial 0 si es el primer turno | | | |
+| A-05 | Abrir el turno "Completo" (nombre que trae el formulario) con un encargado | Una fila por producto activo; inicial 0 si es el primer turno | | | |
 | A-06 | Como administrador, ajustar el inicial de la Gaseosa a 24; como encargado, intentar hacerlo | El administrador lo logra; el encargado no puede editar el campo | | | |
 | A-07 | Gaseosa: entrada 12, vendida 18 | Inventario final calculado 18; total de venta $63.000 | | | |
 | A-08 | Intentar vendida 40 | Rechazo: supera lo disponible | | | |
@@ -49,6 +49,21 @@ Diligenciar las tres últimas columnas durante la prueba. Evidencia: captura de 
 | A-15 a A-18 | Turno actual → "Revisar y cerrar", o Historial → el turno |
 | A-20 | Historial |
 
-## Opcionales
+## Opcionales (P09)
 
-A-22 (turno de cocina) y A-23 (factura con aumento de precio) corresponden a las funcionalidades opcionales F5 y F6. Se agregan y verifican después de P09.
+F5 (turno de cocina) y F6 (facturas de compra con aviso de aumento) ya están construidas. Se prueban en las pestañas **Cocina** y **Facturas**.
+
+| ID | Acción | Resultado esperado | Resultado obtenido | Evidencia | Observación |
+|---|---|---|---|---|---|
+| A-22 | Registrar un turno de cocina (por ejemplo, Arroz: existencia 10, salida 4) | Inventario final esperado = existencia − salida (6) | | | |
+| A-23 | Registrar dos facturas del mismo producto, la segunda con valor mayor (por ejemplo, 2.000 y luego 2.500) | Notificación de aumento de precio (sube de $2.000 a $2.500, +$500) | | | |
+
+Verificación previa en desarrollo (P09): A-22 dio 10 − 4 = 6 y rechazó una salida mayor que la existencia. A-23 avisó el aumento solo en la segunda factura (2.000 → 2.500), no en la tercera (1.800), y rechazó un número de factura repetido.
+
+## Extensión: fotos de facturas del turno
+
+| ID | Acción | Resultado esperado | Resultado obtenido | Evidencia | Observación |
+|---|---|---|---|---|---|
+| A-24 | Con el turno abierto, desde el celular del encargado, tocar "Tomar foto" y fotografiar un recibo | La miniatura aparece en "Fotos de facturas" del turno | | | |
+| A-25 | Como administrador, abrir el turno en el Historial (también ya cerrado) y tocar la foto | Se ve la foto ampliada; en un turno cerrado no se puede agregar ni borrar | | | |
+| A-26 | Copiar la dirección de una foto y abrirla en una ventana de incógnito, sin sesión | Rechazo: la foto no es pública | | | |
