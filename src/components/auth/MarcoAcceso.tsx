@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { BotonTema } from "@/components/ui/BotonTema";
 
 /**
  * Marco de las pantallas de acceso (login, recuperar y restablecer contraseña), con el diseño del inventario:
@@ -6,7 +7,8 @@ import type { ReactNode } from "react";
  */
 export function MarcoAcceso({ children }: { children: ReactNode }) {
   return (
-    <main className="flex min-h-screen flex-1 flex-col bg-fondo text-texto md:flex-row">
+    <main className="relative flex min-h-screen flex-1 flex-col bg-fondo text-texto md:flex-row">
+      <BotonTema variante="acceso" className="absolute right-3 top-3 z-10" />
       <section className="flex flex-col justify-between gap-6 bg-primario px-6 py-6 text-white md:w-[44%] md:px-12 md:py-12">
         <p className="text-sm font-semibold tracking-wide text-white/85">El Caleño</p>
         <div className="hidden md:block">

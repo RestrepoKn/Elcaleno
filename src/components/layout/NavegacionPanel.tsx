@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BotonTema } from "@/components/ui/BotonTema";
 
 export type EnlacePanel = { href: string; texto: string };
 
@@ -21,6 +22,7 @@ export function NavegacionPanel({ nombre, enlaces }: { nombre: string; enlaces: 
           <span className="hidden max-w-[16rem] truncate text-white/80 sm:inline" title={nombre}>
             {nombre}
           </span>
+          <BotonTema />
           <form action="/api/auth/logout" method="post">
             <button
               type="submit"

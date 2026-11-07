@@ -8,7 +8,7 @@ export function Button({ variant = "primary", size = "md", loading = false, clas
     primary: "bg-primario text-white hover:bg-primario-oscuro",
     secondary: "border border-borde bg-superficie text-texto hover:bg-primario-suave",
     ghost: "text-primario hover:bg-primario-suave",
-    danger: "bg-alerta-roja text-white hover:bg-alerta-roja-texto",
+    danger: "bg-alerta-roja text-white hover:brightness-90",
   };
   const sizes = { sm: "min-h-9 px-3 text-sm", md: "min-h-11 px-4 text-sm", lg: "min-h-12 px-5 text-base" };
   return (

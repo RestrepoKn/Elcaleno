@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { BotonTema } from "@/components/ui/BotonTema";
 import type { Rol } from "@/lib/datos/tipos";
 
 type Enlace = { href: string; texto: string; soloAdministrador?: boolean };
@@ -47,6 +48,7 @@ export function NavegacionInventario({ email, rol, sugerenciasSinLeer = 0 }: { e
           <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold">
             {rol === "administrador" ? "Administrador" : "Encargado"}
           </span>
+          <BotonTema />
           <form action="/api/auth/logout" method="post">
             <button
               type="submit"
@@ -72,7 +74,7 @@ export function NavegacionInventario({ email, rol, sugerenciasSinLeer = 0 }: { e
                 >
                   {e.texto}
                   {e.href === "/inventario/sugerencias" && sugerenciasSinLeer > 0 ? (
-                    <span className="ml-1.5 rounded-full bg-white px-1.5 text-xs font-bold text-primario tabular-nums">
+                    <span className="ml-1.5 rounded-full bg-white px-1.5 text-xs font-bold text-[#990011] tabular-nums">
                       {sugerenciasSinLeer}
                       <span className="sr-only"> sin leer</span>
                     </span>

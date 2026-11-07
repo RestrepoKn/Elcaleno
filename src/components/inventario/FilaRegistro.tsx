@@ -215,16 +215,18 @@ export function FilaRegistro({
     cola.current = cola.current.then(guardar);
   }
 
+  // El fondo sale de las variables del tema (claro u oscuro) y cambia con una transición de CSS.
   const fondo =
-    resultado === "faltante" ? "rgba(198, 40, 40, 0.06)" : resultado === "sobrante" ? "rgba(58, 90, 122, 0.06)" : "rgba(255, 255, 255, 1)";
+    resultado === "faltante"
+      ? "border-alerta-roja/40 bg-[color-mix(in_srgb,var(--color-alerta-roja)_7%,var(--color-superficie))]"
+      : resultado === "sobrante"
+        ? "border-borde bg-[color-mix(in_srgb,var(--color-sobrante)_7%,var(--color-superficie))]"
+        : "border-borde bg-superficie";
 
   return (
     <motion.li
       layout="position"
-      animate={{ backgroundColor: fondo }}
-      transition={{ duration: 0.35 }}
-      className={`flex flex-col gap-3 rounded-xl border p-3 sm:p-4
-        ${resultado === "faltante" ? "border-alerta-roja/40" : "border-borde"}`}
+      className={`flex flex-col gap-3 rounded-xl border p-3 transition-colors duration-300 motion-reduce:transition-none sm:p-4 ${fondo}`}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h3 className="font-semibold text-texto">{registro.nombre}</h3>

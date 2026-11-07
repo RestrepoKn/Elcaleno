@@ -32,6 +32,39 @@
   --color-borde: #e9d9d8;
 }
 
+/*
+ * Tema oscuro (botón sol/luna, arriba a la derecha). Se activa con <html data-theme="oscuro">.
+ * Redefine las variables de color: todo lo que usa bg-fondo, bg-superficie, text-texto, border-borde, etc. cambia solo.
+ * El cereza de la barra y de los botones se mantiene (con texto blanco tiene buen contraste).
+ */
+html[data-theme="oscuro"] {
+  color-scheme: dark;
+  --background: #121014;
+  --foreground: #f1ecec;
+  --color-fondo: #121014;
+  --color-superficie: #1c181b;
+  --color-borde: #3b3236;
+  --color-texto: #f1ecec;
+  --color-texto-suave: #bcaeb0;
+  --color-primario-suave: #3a1c22;
+  --color-alerta-amarilla-texto: #f3c95f;
+  --color-alerta-roja-texto: #ff9289;
+  --color-ok-texto: #93d6a2;
+}
+
+/*
+ * Estos colores se usan como fondo (con texto blanco) y también como texto.
+ * En oscuro solo se aclaran como texto, para que se lean sobre el fondo oscuro.
+ * Van fuera de las capas de Tailwind para que tengan prioridad sobre sus utilidades.
+ */
+html[data-theme="oscuro"] .text-primario { color: #ff8f9a; }
+html[data-theme="oscuro"] .text-primario-oscuro { color: #ffb4bb; }
+html[data-theme="oscuro"] .text-reponer { color: #a3b3ff; }
+html[data-theme="oscuro"] .text-sobrante { color: #9fc5ea; }
+html[data-theme="oscuro"] .text-turno-abierto { color: #8fd0ef; }
+html[data-theme="oscuro"] .text-turno-revision { color: #c9abf0; }
+html[data-theme="oscuro"] .text-turno-cerrado { color: #bac4cb; }
+
 body {
   margin: 0;
   background: var(--background);

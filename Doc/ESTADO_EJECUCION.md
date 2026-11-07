@@ -351,3 +351,22 @@ Las contraseñas se generan en cada ejecución y no se guardan aquí.
   - Eliminar da 200, y repetirlo da 404. `/notes` lleva al buzón; el panel muestra la tarjeta.
   - Las comprobaciones 6 y 7 fallaron al principio porque la frase buscada estaba partida en varios elementos HTML; con el texto visible pasan.
 - `npm run type-check`, `npm test` (143), `npm run lint` y `npm run build`: todo correcto.
+
+### Tema claro y oscuro · 2026-11-07
+
+- Pedido del estudiante: un botón arriba a la derecha para pasar de fondo claro a oscuro, con los colores del texto ajustados para que se lean.
+- `src/components/ui/BotonTema.tsx`: botón sol/luna, con `useSyncExternalStore`, `aria-pressed` y una etiqueta según el tema. Guarda la elección en `localStorage` ("tema"), solo en ese navegador.
+  - Está en la barra del inventario, en la del panel y en las pantallas de acceso (esquina superior derecha).
+- `globals.css`, regla `html[data-theme="oscuro"]`:
+  - Redefine fondo, superficie, borde, texto y texto suave, el tinte cereza y los colores de texto de las alertas. Activa `color-scheme: dark` para el calendario, las listas y las barras de desplazamiento.
+  - Los colores que sirven de fondo y de texto (primario, reponer, sobrante y estados del turno) se aclaran solo como texto, con reglas fuera de las capas de Tailwind.
+  - Las utilidades compiladas usan `var(--color-*)`, verificado en el CSS del build.
+- `app/layout.tsx`: un script en línea aplica el tema guardado antes de dibujar la página, para que no parpadee; el `<html>` lleva `suppressHydrationWarning`.
+- Ajustes:
+  - `FilaRegistro`: el fondo ya no es un `rgba` blanco animado con Framer, sino clases con `color-mix` sobre `--color-superficie` y una transición de CSS que respeta la preferencia de menos movimiento.
+  - Botón de peligro: `hover:brightness-90`.
+  - Contador de sugerencias: cereza fijo sobre blanco.
+- Se quitó `ThemeProvider` del layout del panel: ponía `data-theme="dark"` y chocaba con el tema nuevo. `ThemeToggle` y `ThemeProvider` quedan sin uso.
+- Verificación con `next dev`: el botón aparece en `/login`, `/inventario`, `/inventario/turno`, `/dashboard` y `/users`, y el script de arranque está en la página.
+- Pendiente: revisar el aspecto del tema oscuro en un navegador, porque no hay navegador en esta sesión.
+- `npm run type-check`, `npm test` (143), `npm run lint` y `npm run build`: todo correcto.

@@ -6,7 +6,7 @@ type Tamano = "sm" | "md" | "lg";
 const VARIANTES: Record<Variante, string> = {
   primario: "bg-primario text-white hover:bg-primario-oscuro",
   secundario: "border border-borde bg-superficie text-texto hover:bg-primario-suave",
-  peligro: "bg-alerta-roja text-white hover:bg-alerta-roja-texto",
+  peligro: "bg-alerta-roja text-white hover:brightness-90",
   fantasma: "text-primario hover:bg-primario-suave",
 };
 

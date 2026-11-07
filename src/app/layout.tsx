@@ -12,10 +12,17 @@ export const metadata: Metadata = {
   description: "Sistema fullstack TypeScript con motor de datos JSON.",
 };
 
+// Aplica el tema guardado (botón sol/luna) antes de dibujar la página, para que no parpadee en claro.
+const SCRIPT_TEMA = `try{if(localStorage.getItem("tema")==="oscuro")document.documentElement.dataset.theme="oscuro"}catch(e){}`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${spaceGrotesk.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    // El script cambia data-theme en el navegador antes de hidratar: es intencional.
+    <html lang="es" className={`${spaceGrotesk.variable} h-full antialiased`} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
+        {children}
+      </body>
     </html>
   );
 }
